@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mark Attendance</title>
+<link rel="stylesheet" href="scan.css">
+</head>
+<body>
+
+    <div class="container">
+      <div class="card">
+    
+        <h2>Attendance Verification</h2>
+    
+        <form id="attendanceForm">
+          <input type="text" id="studentName" placeholder="Enter Name" required>
+          <input type="text" id="studentId" placeholder="Enter ID" required>
+          <button type="submit">Mark Attendance</button>
+        </form>
+    
+        <p id="msg"></p>
+    
+      </div>
+    </div>
+</body>    
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const session = params.get("session");
+
+if(!session){
+document.body.innerHTML="<h2 style='text-align:center;color:red'>Invalid Session</h2>";
+}
+
+
+document.getElementById("attendanceForm").onsubmit=(e)=>{
+e.preventDefault();
+
+document.getElementById("msg").innerText="Attendance Marked ✅";
+};
+</script>
+
+</html>

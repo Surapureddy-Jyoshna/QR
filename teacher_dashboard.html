@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+<div class="sidebar-header">
+<div class="user-info">
+<div class="avatar"><i class="fas fa-chalkboard-teacher"></i></div>
+<div>
+<h3 id="teacherName">Loading...</h3>
+<p id="teacherId">Teacher ID: --</p>
+</div>
+</div>
+</div>
+
+<nav class="sidebar-nav">
+<a href="#" class="nav-item active" data-page="overview">Dashboard</a>
+<a href="#" class="nav-item" data-page="classes">Classes</a>
+<a href="#" class="nav-item" id="logoutBtn">Logout</a>
+</nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+
+<header class="dashboard-header">
+<h1>Teacher Dashboard</h1>
+<button class="btn btn-primary" id="createClassBtn">Create Class</button>
+</header>
+
+<!-- QR SECTION -->
+<div class="card center">
+<h2>Live Attendance QR</h2>
+
+<button onclick="startAttendance()">Start Attendance</button>
+<button onclick="closeAttendance()">Close Attendance</button>
+
+<div id="qrWrapper" style="display:none">
+<div id="qrcode" class="qr-box"></div>
+<p id="timerText" class="timer"></p>
+</div>
+</div>
+
+<!-- STATS -->
+<div class="card">
+<h3>Total Classes</h3>
+<h1 id="totalClasses">0</h1>
+</div>
+
+<div class="card">
+<h3>Total Students</h3>
+<h1 id="totalStudents">0</h1>
+</div>
+
+</main>
+</div>
+
+<!-- QR LIBRARY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- DASHBOARD SCRIPT -->
+<script src="dashborad.js"></script>
+
+</body>
+</html>

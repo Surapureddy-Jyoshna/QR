@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="teacher_login.css">
+</head>
+<body>
+
+<div class="card">
+
+<h2>Teacher Login</h2>
+
+<form onsubmit="return validateForm()">
+
+<div class="input-box">
+<label>Email</label>
+<input type="email" id="email" placeholder="Enter email">
+<div class="error" id="emailError">Enter valid email</div>
+</div>
+
+<div class="input-box password-wrap">
+<label>Password</label>
+<input type="password" id="password" placeholder="Enter password">
+<span class="toggle" onclick="togglePass()">Show</span>
+<div class="error" id="passError">Password required</div>
+</div>
+
+<button type="submit">Login</button>
+
+</form>
+
+<a href="home.html" class="back">← Back to Home</a>
+
+</div>
+
+<script>
+function togglePass(){
+let p=document.getElementById("password");
+p.type=p.type==="password"?"text":"password";
+}
+
+function validateForm(){
+
+let email=document.getElementById("email");
+let pass=document.getElementById("password");
+
+let emailErr=document.getElementById("emailError");
+let passErr=document.getElementById("passError");
+
+let valid=true;
+
+if(email.value.trim()===""){
+emailErr.style.display="block";
+valid=false;
+}else{
+emailErr.style.display="none";
+}
+
+if(pass.value.trim()===""){
+passErr.style.display="block";
+valid=false;
+}else{
+passErr.style.display="none";
+}
+
+return valid;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QR Attendance System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+<div class="logo">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+<rect x="3" y="3" width="7" height="7" rx="2" fill="#2563eb"/>
+<rect x="14" y="3" width="7" height="7" rx="2" fill="#1e40af"/>
+<rect x="14" y="14" width="7" height="7" rx="2" fill="#60a5fa"/>
+<rect x="3" y="14" width="7" height="7" rx="2" fill="#93c5fd"/>
+</svg>
+<span onclick="location.href='home.html'">QR Attendance</span>
+</div>
+
+<ul>
+<li><a href="#">Home</a></li>
+<li><a href="#workflow">Workflow</a></li>
+<li><a href="#features">Features</a></li>
+</ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<h1>QR Based Attendance Management System</h1>
+<p>Smart attendance tracking using secure QR technology</p>
+
+<div class="buttons">
+<button class="btn teacher" onclick="location.href='teacher_signup.html'">Join as Teacher</button>
+<button class="btn student" onclick="location.href='student_signup.html'">Join as Student</button>
+</div>
+
+<div class="login-container">
+<button class="btn login-btn" onclick="openPopup()">Login</button>
+</div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="section" id="workflow">
+<h2>System Workflow</h2>
+<div class="grid">
+<div class="card"><h3>Create QR</h3><p>Teacher generates secure QR code.</p></div>
+<div class="card"><h3>Scan Code</h3><p>Students scan QR using camera.</p></div>
+<div class="card"><h3>Verify</h3><p>System verifies identity.</p></div>
+<div class="card"><h3>Attendance Stored</h3><p>Saved instantly in database.</p></div>
+</div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+<h2>Core Features</h2>
+<div class="grid">
+<div class="card"><h3>Role-Based Access</h3><p>Separate dashboards.</p></div>
+<div class="card"><h3>Auto QR Expiry</h3><p>Prevents proxy attendance.</p></div>
+<div class="card"><h3>Instant Reports</h3><p>Download anytime.</p></div>
+<div class="card"><h3>Secure System</h3><p>Authentication validation.</p></div>
+</div>
+</section>
+
+<footer>
+© 2026 QR Attendance Management System
+</footer>
+
+<!-- LOGIN POPUP -->
+<div id="loginPopup" class="popup">
+<div class="popup-box">
+<h2>Select Login Type</h2>
+<button onclick="location.href='teacher_login.html'">Teacher Login</button>
+<button onclick="location.href='student_login.html'">Student Login</button>
+
+
+<span class="close" onclick="closePopup()">×</span>
+</div>
+</div>
+
+<script>
+function openPopup(){
+document.getElementById("loginPopup").style.display="flex";
+}
+
+function closePopup(){
+document.getElementById("loginPopup").style.display="none";
+}
+
+window.onclick=function(e){
+let popup=document.getElementById("loginPopup");
+if(e.target==popup){
+popup.style.display="none";
+}
+}
+</script>
+
+</body>
+</html>

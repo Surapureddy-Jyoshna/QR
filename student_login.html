@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="student_login.css">
+</head>
+<body>
+
+<div class="card">
+
+<h2>Student Login</h2>
+
+<form onsubmit="return validateForm()">
+
+<div class="input-box">
+<label>Roll Number</label>
+<input type="text" id="roll" placeholder="Enter roll number">
+<div class="error" id="rollError">Roll number required</div>
+</div>
+
+<div class="input-box password-wrap">
+<label>Password</label>
+<input type="password" id="password" placeholder="Enter password">
+<span class="toggle" onclick="togglePass()">Show</span>
+<div class="error" id="passError">Password required</div>
+</div>
+
+<button type="submit">Login</button>
+
+</form>
+
+<a href="home.html" class="back">← Back to Home</a>
+
+</div>
+
+<script>
+
+function togglePass(){
+let p=document.getElementById("password");
+p.type=p.type==="password"?"text":"password";
+}
+
+function validateForm(){
+
+let roll=document.getElementById("roll");
+let pass=document.getElementById("password");
+
+let rollErr=document.getElementById("rollError");
+let passErr=document.getElementById("passError");
+
+let valid=true;
+
+if(roll.value.trim()===""){
+rollErr.style.display="block";
+valid=false;
+}else{
+rollErr.style.display="none";
+}
+
+if(pass.value.trim()===""){
+passErr.style.display="block";
+valid=false;
+}else{
+passErr.style.display="none";
+}
+
+return valid;
+}
+
+</script>
+
+</body>
+</html>
