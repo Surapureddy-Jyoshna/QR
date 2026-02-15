@@ -12,11 +12,12 @@
 
 <h2>Student Login</h2>
 
-<form onsubmit="return validateForm()">
+<form id="studentLoginForm">
 
 <div class="input-box">
-<label>Roll Number</label>
-<input type="text" id="roll" placeholder="Enter roll number">
+<label>Student ID</label>
+<input type="text" id="studentId" placeholder="Enter Student ID">
+
 <div class="error" id="rollError">Roll number required</div>
 </div>
 
@@ -35,7 +36,7 @@
 
 </div>
 
-<script>
+<!-- <script>
 
 function togglePass(){
 let p=document.getElementById("password");
@@ -69,7 +70,8 @@ passErr.style.display="none";
 return valid;
 }
 
-</script>
+</script> -->
+<script src="student_login.js"></script>
 
 </body>
 </html>

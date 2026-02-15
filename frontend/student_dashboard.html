@@ -29,6 +29,24 @@
             background:#e0f2fe;
             border-radius:8px;
         }
+        .logout-btn{
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    background:#ef4444;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    background:#dc2626;
+}
+
     </style>
 </head>
 <body>
@@ -43,7 +61,12 @@
     <div class="attendance">
         <b>Attendance:</b> <span id="attendance"></span> %
     </div>
+    <button id="studentLogout" class="logout-btn">Logout</button>
+
+
+
 </div>
+
 
 <script>
     const studentId = localStorage.getItem("studentId");
@@ -58,6 +81,20 @@
     })
     .catch(err => console.error(err));
 </script>
+<script>
+    document.getElementById("studentLogout")
+    .addEventListener("click", function(){
+    
+        const confirmLogout = confirm("Are you sure you want to logout?");
+    
+        if(confirmLogout){
+            localStorage.removeItem("studentId");
+            window.location.href = "home.html";
+        }
+    });
+    </script>
+    
+    
 
 </body>
 </html>

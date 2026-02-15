@@ -15,7 +15,8 @@ const sessionId = "SESSION_"+Date.now();
 expiryTime = Date.now() + 120000;
 
 // CHANGE IP IF NEEDED
-const qrURL = `http://10.87.15.137:5500/scan.html?session=${sessionId}`;
+const qrURL = `${window.location.origin}/frontend/scan.html?session=${sessionId}`;
+
 
 new QRCode(qrDiv,{
 text:qrURL,

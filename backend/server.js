@@ -47,6 +47,23 @@ app.post("/student/signup", async (req, res) => {
   await newStudent.save();
   res.json({ message: "Student Registered Successfully" });
 });
+// Student Login API
+app.post("/student/login", async (req, res) => {
+  const { studentId, password } = req.body;
+
+  const student = await Student.findOne({ studentId });
+
+  if (!student) {
+    return res.status(404).json({ message: "User does not exist" });
+  }
+
+  if (student.password !== password) {
+    return res.status(401).json({ message: "Incorrect password" });
+  }
+
+  res.json({ message: "Login Successful", student });
+});
+
 // Get Student Details by Student ID
 app.get("/student/:studentId", async (req, res) => {
   try {
@@ -72,6 +89,23 @@ app.post("/teacher/signup", async (req, res) => {
   await newTeacher.save();
   res.json({ message: "Teacher Registered Successfully" });
 });
+// Teacher Login API
+app.post("/teacher/login", async (req, res) => {
+  const { employeeId, password } = req.body;
+
+  const teacher = await Teacher.findOne({ employeeId });
+
+  if (!teacher) {
+    return res.status(404).json({ message: "User does not exist" });
+  }
+
+  if (teacher.password !== password) {
+    return res.status(401).json({ message: "Incorrect password" });
+  }
+
+  res.json({ message: "Login Successful", teacher });
+});
+
 
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");

@@ -31,7 +31,11 @@
     <a href="#" class="nav-item"><i class="fas fa-users"></i> Students</a>
     <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Reports</a>
     <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-    <a href="#" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="#" id="teacherLogout" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i> Logout
+   </a>
+   
+   
   </nav>
 </aside>
 
@@ -90,9 +94,56 @@
 
 </main>
 </div>
+<!-- Logout Modal -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="btn-danger">Yes, Logout</button>
+      <button id="cancelLogout" class="btn-secondary">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="dashborad.js"></script>
-
+<script>
+  document.getElementById("teacherLogout")
+  .addEventListener("click", function(e){
+  
+      e.preventDefault();
+  
+      const confirmLogout = confirm("Are you sure you want to logout?");
+  
+      if(confirmLogout){
+          localStorage.removeItem("employeeId");
+          window.location.href = "home.html";
+      }
+  });
+  </script>
+<script>
+  const logoutBtn = document.getElementById("teacherLogout");
+  const modal = document.getElementById("logoutModal");
+  const confirmBtn = document.getElementById("confirmLogout");
+  const cancelBtn = document.getElementById("cancelLogout");
+  
+  logoutBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      modal.style.display = "flex";
+  });
+  
+  cancelBtn.addEventListener("click", function(){
+      modal.style.display = "none";
+  });
+  
+  confirmBtn.addEventListener("click", function(){
+      localStorage.removeItem("employeeId");
+      window.location.href = "home.html";
+  });
+  </script>
+  
+  
+  
 </body>
 </html>
