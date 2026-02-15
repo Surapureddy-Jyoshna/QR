@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        body{
+            font-family: Arial;
+            background:#f4f7fb;
+            padding:40px;
+        }
+        .card{
+            background:white;
+            padding:30px;
+            width:400px;
+            margin:auto;
+            border-radius:10px;
+            box-shadow:0 10px 20px rgba(0,0,0,0.1);
+        }
+        h2{
+            text-align:center;
+        }
+        .info{
+            margin:15px 0;
+            font-size:16px;
+        }
+        .attendance{
+            margin-top:20px;
+            padding:15px;
+            background:#e0f2fe;
+            border-radius:8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Student Dashboard 🎓</h2>
+
+    <div class="info"><b>Name:</b> <span id="name"></span></div>
+    <div class="info"><b>Email:</b> <span id="email"></span></div>
+    <div class="info"><b>Student ID:</b> <span id="studentId"></span></div>
+
+    <div class="attendance">
+        <b>Attendance:</b> <span id="attendance"></span> %
+    </div>
+</div>
+
+<script>
+    const studentId = localStorage.getItem("studentId");
+
+    fetch("http://localhost:5000/student/" + studentId)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("name").innerText = data.name;
+        document.getElementById("email").innerText = data.email;
+        document.getElementById("studentId").innerText = data.studentId;
+        document.getElementById("attendance").innerText = data.attendance;
+    })
+    .catch(err => console.error(err));
+</script>
+
+</body>
+</html>
