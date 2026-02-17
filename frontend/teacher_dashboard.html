@@ -39,7 +39,10 @@
   
   <div id="myClassesContainer" style="margin-left:20px;"></div>
   
-    <a href="#" class="nav-item"><i class="fas fa-users"></i> Students</a>
+  <a href="#" id="studentsLink" class="nav-item" onclick="showStudents()">
+    <i class="fas fa-users"></i> Students
+  </a>
+  
     <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Reports</a>
     <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
     <a href="#" id="teacherLogout" class="nav-item">
@@ -143,6 +146,35 @@
 
     </div>
 </div>
+
+<!-- STUDENTS SECTION -->
+<div id="studentsSection" style="display:none; margin-top:30px;">
+  <div class="students-card">
+
+      <div class="students-header">
+          <h2>Students</h2>
+
+          <div class="students-controls">
+              <select id="studentSectionSelect" class="modern-select">
+                  <option value="">Select Section</option>
+                  <option value="A">Section A</option>
+                  <option value="B">Section B</option>
+                  <option value="C">Section C</option>
+                  <option value="D">Section D</option>
+                  <option value="E">Section E</option>
+              </select>
+
+              <input type="text" id="studentSearch"
+                  placeholder="Search by name or roll number...">
+          </div>
+      </div>
+
+      <div id="studentsListContainer" class="students-list"></div>
+
+  </div>
+</div>
+
+
 
   <!-- Conduct Class Modal -->
 <div id="classModal" class="modal-overlay">

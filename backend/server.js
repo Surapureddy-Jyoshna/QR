@@ -270,6 +270,24 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
     });
 });
 
+// Get Students by Section
+app.get("/teacher/students/:section", authenticateToken, async (req, res) => {
+
+  const section = req.params.section;
+  const students = [];
+
+  fs.createReadStream(__dirname + "/CSE.csv")
+    .pipe(csv())
+    .on("data", (data) => {
+        if(data.Section === section){
+            students.push(data);
+        }
+    })
+    .on("end", () => {
+        res.json(students);
+    });
+
+});
 
 
 

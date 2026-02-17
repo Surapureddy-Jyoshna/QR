@@ -278,6 +278,8 @@ function setActiveLink(linkId){
 
     document.getElementById("dashboardLink").classList.remove("active");
     document.getElementById("myClassesLink").classList.remove("active");
+    document.getElementById("studentsLink").classList.remove("active");
+
 
     document.getElementById(linkId).classList.add("active");
 }
@@ -321,4 +323,80 @@ async function loadSectionData(){
 document.getElementById("myClassSectionSelect")
 .addEventListener("change", function(){
     showMyClasses();
+});
+
+
+function showStudents(){
+
+    setActiveLink("studentsLink");
+
+    document.querySelector(".qr-card").style.display = "none";
+    document.querySelector(".stats-grid").style.display = "none";
+    document.getElementById("myClassesSection").style.display = "none";
+    document.getElementById("studentsSection").style.display = "block";
+}
+document.getElementById("studentSectionSelect")
+.addEventListener("change", async function(){
+
+    const section = this.value;
+
+    if(!section){
+        document.getElementById("studentsListContainer").innerHTML = "";
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `http://localhost:5000/teacher/students/${section}`,
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const students = await response.json();
+
+    const container = document.getElementById("studentsListContainer");
+    container.innerHTML = "";
+
+    if(students.length === 0){
+        container.innerHTML = "<p>No students found.</p>";
+        return;
+    }
+
+    students.forEach(student => {
+
+        const div = document.createElement("div");
+        div.className = "student-card";
+
+        div.innerHTML = `
+            <div class="student-left">
+            <h3>${student.Name}</h3>
+            <p>Roll No: ${student.RollNo}</p>
+        </div>
+
+        <div class="student-right">
+            <span class="section-badge">
+                Section ${student.Section}
+           </span>
+       </div>
+`       ;
+
+
+        container.appendChild(div);
+    });
+
+});
+document.getElementById("studentSearch")
+.addEventListener("input", function(){
+
+    const value = this.value.toLowerCase();
+    const cards = document.querySelectorAll(".student-card");
+
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(value) ? "flex" : "none";
+    });
 });
