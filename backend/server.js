@@ -12,14 +12,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Student DB Connection
-const studentConnection = mongoose.createConnection(
-  "mongodb://127.0.0.1:27017/studentDB"
-);
-
-const teacherConnection = mongoose.createConnection(
-  "mongodb://127.0.0.1:27017/teacherDB"
-);
+mongoose.connect(
+  "mongodb://surapureddyjyoshna18_db_user:jyoshna%401418@ac-8ljpoyh-shard-00-00.r74rbfc.mongodb.net:27017,ac-8ljpoyh-shard-00-01.r74rbfc.mongodb.net:27017,ac-8ljpoyh-shard-00-02.r74rbfc.mongodb.net:27017/College?ssl=true&replicaSet=atlas-5jt819-shard-0&authSource=admin&retryWrites=true&w=majority"
+)
+  .then(() => console.log("MongoDB Connected ✅"))
+  .catch(err => console.log("Mongo Error ❌", err));
 
 // Student Schema
 const studentSchema = new mongoose.Schema({
@@ -33,18 +30,18 @@ const studentSchema = new mongoose.Schema({
   }
 });
 
-const Student = studentConnection.model("Student", studentSchema);
+const Student = mongoose.model("Student", studentSchema, "Students");
 
 // Teacher Schema
 const teacherSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  employeeId: String,
-  department: String,
-  password: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  employeeId: { type: String, required: true, unique: true },
+  department: { type: String, required: true },
+  password: { type: String, required: true }
 });
 
-const Teacher = teacherConnection.model("Teacher", teacherSchema);
+const Teacher = mongoose.model("Teacher", teacherSchema, "Teachers");
 
 const classSchema = new mongoose.Schema({
   teacherId: {
@@ -65,8 +62,7 @@ const classSchema = new mongoose.Schema({
   }
 });
 
-
-const Class = teacherConnection.model("Class", classSchema);
+const Class = mongoose.model("Class", classSchema, "Classes");
 
 // Student Signup API
 app.post("/student/signup", async (req, res) => {
@@ -112,9 +108,41 @@ app.get("/student/:studentId", async (req, res) => {
 
 // Teacher Signup API
 app.post("/teacher/signup", async (req, res) => {
-  const newTeacher = new Teacher(req.body);
-  await newTeacher.save();
-  res.json({ message: "Teacher Registered Successfully" });
+  try {
+    console.log("📥 Incoming Data:", req.body);
+
+    const { name, email, employeeId, password, department } = req.body;
+
+    // ✅ Validate fields
+    if (!name || !email || !employeeId || !password || !department) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    // ✅ Check duplicate user
+    const existing = await Teacher.findOne({ employeeId });
+
+    if (existing) {
+      return res.status(400).json({ message: "Teacher already exists" });
+    }
+
+    const newTeacher = new Teacher({
+      name,
+      email,
+      employeeId,
+      password,
+      department
+    });
+
+    await newTeacher.save();
+
+    console.log("✅ Saved successfully");
+
+    res.json({ message: "Teacher Registered Successfully" });
+
+  } catch (error) {
+    console.error("❌ FULL ERROR:", error);   // 👈 VERY IMPORTANT
+    res.status(500).json({ message: "Signup Failed" });
+  }
 });
 // Teacher Login API
 app.post("/teacher/login", async (req, res) => {
@@ -295,7 +323,33 @@ app.get("/teacher/students/:section", authenticateToken, async (req, res) => {
 
 });
 
+app.post("/teacher/start-session", (req, res) => {
 
+  const sessionId = "SESSION_" + Date.now();
+
+  // store session (temporary memory)
+  global.sessions = global.sessions || [];
+
+  global.sessions.push({
+    sessionId,
+    createdAt: Date.now()
+  });
+
+  res.json({ sessionId });
+});
+app.post("/student/mark-attendance", (req, res) => {
+
+  const { sessionId } = req.body;
+
+  const session = global.sessions.find(s => s.sessionId === sessionId);
+
+  if (!session) {
+    return res.json({ success: false, message: "Invalid session" });
+  }
+
+  // ✅ valid session → allow attendance
+  res.json({ success: true });
+});
 
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");

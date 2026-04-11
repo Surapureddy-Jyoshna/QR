@@ -59,59 +59,91 @@ window.onload = async function(){
 
 let attendanceTimer;
 let expiryTime;
+async function startAttendance(){
 
-function startAttendance(){
+  closeAttendance();
 
-closeAttendance();
+  const token = localStorage.getItem("token");
 
-const qrWrapper = document.getElementById("qrWrapper");
-const qrDiv = document.getElementById("qrcode");
+  // 🔥 CALL BACKEND TO CREATE SESSION
+  const res = await fetch("https://your-backend-url.com/teacher/start-session", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  });
 
-qrDiv.innerHTML="";
-qrWrapper.style.display="flex";
+  const data = await res.json();
+  const sessionId = data.sessionId; // ✅ real session from backend
 
-const sessionId = "SESSION_"+Date.now();
-const token = localStorage.getItem("token");
+  const qrWrapper = document.getElementById("qrWrapper");
+  const qrDiv = document.getElementById("qrcode");
 
-const savedExpiry =
-    localStorage.getItem("qrExpiry_" + token) || 120000;
+  qrDiv.innerHTML="";
+  qrWrapper.style.display="flex";
 
-expiryTime = Date.now() + parseInt(savedExpiry);
+  const qrURL = `${window.location.origin}/scan.html?session=${sessionId}`;
 
+  new QRCode(qrDiv,{
+    text: qrURL,
+    width:220,
+    height:220
+  });
 
-
-// CHANGE IP IF NEEDED
-const qrURL = `${window.location.origin}/frontend/scan.html?session=${sessionId}`;
-
-
-new QRCode(qrDiv,{
-text:qrURL,
-width:220,
-height:220
-});
-
-startTimer();
+  startTimer();
 }
+// function startAttendance(){
 
-function startTimer(){
-attendanceTimer = setInterval(()=>{
+// closeAttendance();
 
-let timeLeft = expiryTime - Date.now();
+// const qrWrapper = document.getElementById("qrWrapper");
+// const qrDiv = document.getElementById("qrcode");
 
-if(timeLeft<=0){
-closeAttendance();
-return;
-}
+// qrDiv.innerHTML="";
+// qrWrapper.style.display="flex";
 
-let sec = Math.floor(timeLeft/1000);
-let m = Math.floor(sec/60);
-let s = sec%60;
+// const sessionId = "SESSION_"+Date.now();
+// const token = localStorage.getItem("token");
 
-document.getElementById("timerText").innerText =
-`Expires in ${m}:${s.toString().padStart(2,"0")}`;
+// const savedExpiry =
+//     localStorage.getItem("qrExpiry_" + token) || 120000;
 
-},1000);
-}
+// expiryTime = Date.now() + parseInt(savedExpiry);
+
+
+
+// // CHANGE IP IF NEEDED
+// const qrURL = `${window.location.origin}/scan.html?session=${sessionId}`;
+
+
+// new QRCode(qrDiv,{
+// text:qrURL,
+// width:220,
+// height:220
+// });
+
+// startTimer();
+// }
+
+// function startTimer(){
+// attendanceTimer = setInterval(()=>{
+
+// let timeLeft = expiryTime - Date.now();
+
+// if(timeLeft<=0){
+// closeAttendance();
+// return;
+// }
+
+// let sec = Math.floor(timeLeft/1000);
+// let m = Math.floor(sec/60);
+// let s = sec%60;
+
+// document.getElementById("timerText").innerText =
+// `Expires in ${m}:${s.toString().padStart(2,"0")}`;
+
+// },1000);
+// }
 
 function closeAttendance(){
 clearInterval(attendanceTimer);
