@@ -126,25 +126,25 @@ async function startAttendance(){
 // startTimer();
 // }
 
-// function startTimer(){
-// attendanceTimer = setInterval(()=>{
+function startTimer(){
+attendanceTimer = setInterval(()=>{
 
-// let timeLeft = expiryTime - Date.now();
+let timeLeft = expiryTime - Date.now();
 
-// if(timeLeft<=0){
-// closeAttendance();
-// return;
-// }
+if(timeLeft<=0){
+closeAttendance();
+return;
+}
 
-// let sec = Math.floor(timeLeft/1000);
-// let m = Math.floor(sec/60);
-// let s = sec%60;
+let sec = Math.floor(timeLeft/1000);
+let m = Math.floor(sec/60);
+let s = sec%60;
 
-// document.getElementById("timerText").innerText =
-// `Expires in ${m}:${s.toString().padStart(2,"0")}`;
+document.getElementById("timerText").innerText =
+`Expires in ${m}:${s.toString().padStart(2,"0")}`;
 
-// },1000);
-// }
+},1000);
+}
 
 function closeAttendance(){
 clearInterval(attendanceTimer);
