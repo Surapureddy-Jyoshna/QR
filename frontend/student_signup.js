@@ -1,3 +1,4 @@
+const BASE_URL = "https://qr-attendance-1-odo4.onrender.com";
 document.getElementById("studentSignupForm")
 .addEventListener("submit", function(e){
 
@@ -15,7 +16,7 @@ document.getElementById("studentSignupForm")
         password
     };
 
-    fetch("http://localhost:5000/student/signup", {
+    fetch(`${BASE_URL}/student/signup`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"

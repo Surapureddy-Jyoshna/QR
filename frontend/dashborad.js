@@ -1,3 +1,4 @@
+const BASE_URL = "https://qr-attendance-1-odo4.onrender.com";
 let currentSection = "";
 function hideAllSections(){
     document.querySelector(".qr-card").style.display = "none";
@@ -19,7 +20,7 @@ window.onload = async function(){
     try{
 
         // ===== LOAD PROFILE =====
-        const response = await fetch("http://localhost:5000/teacher/profile",{
+        const response = await fetch(`${BASE_URL}/teacher/profile`,{
             headers:{ Authorization:"Bearer "+token }
         });
 
@@ -66,7 +67,7 @@ async function startAttendance(){
   const token = localStorage.getItem("token");
 
   // 🔥 CALL BACKEND TO CREATE SESSION
-  const res = await fetch("https://your-backend-url.com/teacher/start-session", {
+  const res = await fetch(`${BASE_URL}/teacher/start-session`, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + token
@@ -170,7 +171,7 @@ async function conductClass(){
         return;
     }
 
-    const response = await fetch("http://localhost:5000/teacher/conduct-class", {
+    const response = await fetch(`${BASE_URL}/teacher/conduct-class`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -198,7 +199,7 @@ async function loadTotalClasses(){
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch("http://localhost:5000/teacher/total-classes", {
+    const response = await fetch(`${BASE_URL}/teacher/total-classes`, {
         headers: {
             Authorization: "Bearer " + token
         }
@@ -220,7 +221,7 @@ async function loadClasses(){
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch("http://localhost:5000/teacher/classes", {
+    const response = await fetch(`${BASE_URL}/teacher/classes`, {
         headers: {
             Authorization: "Bearer " + token
         }
@@ -268,7 +269,7 @@ async function showMyClasses(){
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-        `http://localhost:5000/teacher/my-classes/${section}`,
+        `${BASE_URL}/teacher/my-classes/${section}`,
         {
             headers: {
                 Authorization: "Bearer " + token
@@ -318,7 +319,7 @@ async function deleteClass(id){
     const confirmDelete = confirm("Are you sure you want to delete this class?");
     if(!confirmDelete) return;
 
-    await fetch(`http://localhost:5000/teacher/delete-class/${id}`, {
+    await fetch(`${BASE_URL}/teacher/delete-class/${id}`, {
         method: "DELETE",
         headers: {
             Authorization: "Bearer " + token
@@ -370,7 +371,7 @@ async function loadSectionData(){
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-        `http://localhost:5000/teacher/section-data/${section}`,
+        `${BASE_URL}/teacher/section-data/${section}`,
         {
             headers: {
                 Authorization: "Bearer " + token
@@ -418,7 +419,7 @@ document.getElementById("studentSectionSelect")
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-        `http://localhost:5000/teacher/students/${section}`,
+       `${BASE_URL}/teacher/students/${section}`,
         {
             headers: {
                 Authorization: "Bearer " + token

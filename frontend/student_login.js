@@ -1,3 +1,4 @@
+const BASE_URL = "https://qr-attendance-1-odo4.onrender.com";
 window.onload = function(){
 
     const form = document.getElementById("studentLoginForm");
@@ -9,7 +10,7 @@ window.onload = function(){
         const studentId = document.getElementById("studentId").value;
         const password = document.getElementById("password").value;
 
-        fetch("http://localhost:5000/student/login", {
+        fetch(`${BASE_URL}/student/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
