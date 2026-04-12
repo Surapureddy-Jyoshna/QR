@@ -27,38 +27,39 @@
 const params = new URLSearchParams(window.location.search);
 const sessionId = params.get("session");
 
-const studentId = localStorage.getItem("studentId");
-
-if(!sessionId || !studentId){
-    document.body.innerHTML="<h2>Invalid Access</h2>";
+if(!sessionId){
+    document.body.innerHTML="<h2>Invalid QR</h2>";
 }
 
 // 🔥 CALL BACKEND DIRECTLY (NO FORM NEEDED)
-fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance", {
-    method:"POST",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-        sessionId,
-        studentId
-    })
-})
-.then(res=>res.json())
-.then(data=>{
+document.getElementById("attendanceForm").onsubmit = async (e)=>{
+    e.preventDefault();
+
+    const name = document.getElementById("studentName").value;
+    const studentId = document.getElementById("studentId").value;
+
+    const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            sessionId,
+            studentId,
+            name
+        })
+    });
+
+    const data = await res.json();
 
     if(data.success){
-        document.body.innerHTML=`
-        <h2 style="color:green;">✅ Attendance Marked</h2>
-        <p>Time: ${data.time}</p>
-        `;
+        document.getElementById("msg").innerHTML =
+        `<span style="color:green;">✅ Marked at ${data.time}</span>`;
     }else{
-        document.body.innerHTML=`
-        <h2 style="color:red;">❌ ${data.message}</h2>
-        `;
+        document.getElementById("msg").innerHTML =
+        `<span style="color:red;">❌ ${data.message}</span>`;
     }
-
-});
+};
 </script>
 
 </html>

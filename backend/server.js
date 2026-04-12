@@ -343,7 +343,7 @@ app.post("/teacher/start-session", (req, res) => {
 });
 app.post("/student/mark-attendance", (req, res) => {
 
-  const { sessionId, studentId } = req.body;
+ const { sessionId, studentId, name } = req.body;
 
   const session = global.sessions.find(s => s.sessionId === sessionId);
 
@@ -365,12 +365,12 @@ app.post("/student/mark-attendance", (req, res) => {
     return res.json({ success: false, message: "Attendance already marked" });
   }
 
-  // ✅ Save attendance
   global.attendanceRecords.push({
     sessionId,
     studentId,
+    name,
     time: new Date().toLocaleTimeString()
-  });
+});
 
   res.json({ success: true, time: new Date().toLocaleTimeString() });
 });

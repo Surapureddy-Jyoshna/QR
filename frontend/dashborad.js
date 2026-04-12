@@ -123,6 +123,7 @@ function startLiveCount(){
         }
 
     },2000);
+    loadAttendanceList();
 }
 
 function startTimer(){
@@ -663,3 +664,23 @@ function updateExpiry(value){
         (value / 60000) + " Minutes";
 }
 
+async function loadAttendanceList(){
+
+    if(!window.currentSessionId) return;
+
+    const res = await fetch(
+        `${BASE_URL}/teacher/session-attendance/${window.currentSessionId}`
+    );
+
+    const data = await res.json();
+
+    const container = document.getElementById("attendanceList");
+
+    container.innerHTML = "<h3>Present Students</h3>";
+
+    data.forEach(s=>{
+        const p = document.createElement("p");
+        p.innerText = `${s.name} (${s.studentId}) - ${s.time}`;
+        container.appendChild(p);
+    });
+}
