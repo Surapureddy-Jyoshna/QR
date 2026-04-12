@@ -67,6 +67,15 @@ const classSchema = new mongoose.Schema({
 });
 
 const Class = mongoose.model("Class", classSchema, "Classes");
+const attendanceSchema = new mongoose.Schema({
+    date: String,
+    section: String,
+    students: [String]   // list of student IDs
+});
+
+const Attendance = mongoose.model("Attendance", attendanceSchema);
+
+
 global.attendanceRecords = [];
 // Student Signup API
 app.post("/student/signup", async (req, res) => {
@@ -333,46 +342,59 @@ app.post("/teacher/start-session", (req, res) => {
 
   // store session (temporary memory)
   global.sessions = global.sessions || [];
-
+  const { section }= req.body;
   global.sessions.push({
     sessionId,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    section
   });
 
   res.json({ sessionId });
 });
-app.post("/student/mark-attendance", (req, res) => {
+app.get("/teacher/attendance/:section/:date", async (req,res)=>{
 
- const { sessionId, studentId, name } = req.body;
+  const { section, date } = req.params;
+
+  const record = await Attendance.findOne({ section, date });
+
+  res.json(record || { students: [] });
+});
+app.post("/student/mark-attendance", async (req, res) => {
+
+  const { sessionId, studentId } = req.body;
 
   const session = global.sessions.find(s => s.sessionId === sessionId);
 
   if (!session) {
-    return res.json({ success: false, message: "Invalid or Expired QR" });
+    return res.json({ success: false, message: "Invalid QR" });
   }
 
-  // ⏱️ Expiry check (2 min)
-  if (Date.now() - session.createdAt > 120000) {
-    return res.json({ success: false, message: "QR Expired" });
+  const date = new Date().toISOString().split("T")[0];
+  const section = session.section || "A"; // fallback
+
+  // 🔥 find existing record
+  let record = await Attendance.findOne({ date, section });
+
+  if (!record) {
+    // create new
+    record = new Attendance({
+      date,
+      section,
+      students: []
+    });
   }
 
-  // 🔁 Duplicate check
-  const alreadyMarked = global.attendanceRecords.find(
-    r => r.sessionId === sessionId && r.studentId === studentId
-  );
-
-  if (alreadyMarked) {
-    return res.json({ success: false, message: "Attendance already marked" });
+  // 🔁 prevent duplicate
+  if (record.students.includes(studentId)) {
+    return res.json({ success: false, message: "Already marked" });
   }
 
-  global.attendanceRecords.push({
-    sessionId,
-    studentId,
-    name,
-    time: new Date().toLocaleTimeString()
-});
+  // ✅ add student
+  record.students.push(studentId);
 
-  res.json({ success: true, time: new Date().toLocaleTimeString() });
+  await record.save();
+
+  res.json({ success: true });
 });
 app.get("/teacher/live-count/:sessionId", (req, res) => {
 
@@ -395,7 +417,16 @@ app.get("/student/history/:studentId", (req, res) => {
   res.json(history);
 });
 
+app.get("/teacher/session-attendance/:sessionId", (req,res)=>{
 
+    const sessionId = req.params.sessionId;
+
+    const list = global.attendanceRecords.filter(
+        r => r.sessionId === sessionId
+    );
+
+    res.json(list);
+});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

@@ -67,13 +67,16 @@ async function startAttendance(){
 
   const token = localStorage.getItem("token");
 
-  // 🔥 CALL BACKEND TO CREATE SESSION
-  const res = await fetch(`${BASE_URL}/teacher/start-session`, {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + token
-    }
-  });
+  const section = document.getElementById("sectionSelect").value;
+
+const res = await fetch(`${BASE_URL}/teacher/start-session`, {
+  method: "POST",
+  headers: {
+    Authorization: "Bearer " + token,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ section })
+});
 
   const data = await res.json();
   const sessionId = data.sessionId; // ✅ real session from backend
