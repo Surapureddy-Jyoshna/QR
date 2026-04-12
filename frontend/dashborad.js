@@ -5,7 +5,8 @@ function hideAllSections(){
     document.querySelector(".stats-grid").style.display = "none";
     document.getElementById("myClassesSection").style.display = "none";
     document.getElementById("studentsSection").style.display = "none";
-    document.getElementById("settingsSection").style.display = "none"; // ADD THIS
+    document.getElementById("settingsSection").style.display = "none"; 
+    document.getElementById("reportsSection").style.display = "none";
 }
 
 window.onload = async function(){
@@ -92,39 +93,28 @@ async function startAttendance(){
   });
 
   startTimer();
+  window.currentSessionId = sessionId;
+
+// 🔥 start live count
+    startLiveCount();
 }
-// function startAttendance(){
+function startLiveCount(){
 
-// closeAttendance();
+    setInterval(async ()=>{
 
-// const qrWrapper = document.getElementById("qrWrapper");
-// const qrDiv = document.getElementById("qrcode");
+        if(!window.currentSessionId) return;
 
-// qrDiv.innerHTML="";
-// qrWrapper.style.display="flex";
+        const res = await fetch(
+            `${BASE_URL}/teacher/live-count/${window.currentSessionId}`
+        );
 
-// const sessionId = "SESSION_"+Date.now();
-// const token = localStorage.getItem("token");
+        const data = await res.json();
 
-// const savedExpiry =
-//     localStorage.getItem("qrExpiry_" + token) || 120000;
+        document.getElementById("liveCount").innerText =
+            "Present: " + data.count;
 
-// expiryTime = Date.now() + parseInt(savedExpiry);
-
-
-
-// // CHANGE IP IF NEEDED
-// const qrURL = `${window.location.origin}/scan.html?session=${sessionId}`;
-
-
-// new QRCode(qrDiv,{
-// text:qrURL,
-// width:220,
-// height:220
-// });
-
-// startTimer();
-// }
+    },3000);
+}
 
 function startTimer(){
 
@@ -356,20 +346,138 @@ function showDashboard(){
     document.querySelector(".stats-grid").style.display = "grid";
 }
 
+function showReports(){
+    hideAllSections();
+    setActiveLink("reportsLink");
 
+    document.getElementById("reportsSection").style.display="block";
+}
+let chart;
 
+async function loadReports(){
 
+    const section = document.getElementById("reportSection").value;
+    const date = document.getElementById("reportDate").value;
 
+    if(!section) return;
 
+    const token = localStorage.getItem("token");
 
+    const res = await fetch(
+        `${BASE_URL}/teacher/reports/${section}?date=${date}`,
+        {
+            headers:{
+                Authorization:"Bearer "+token
+            }
+        }
+    );
+
+    const data = await res.json();
+
+    renderChart(data.trend);
+    renderTable(data.students);
+    renderLowAttendance(data.students);
+}
+function renderChart(trend){
+
+    const ctx = document.getElementById("attendanceChart");
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx,{
+        type:"line",
+        data:{
+            labels: trend.map(t=>t.date),
+            datasets:[{
+                label:"Attendance %",
+                data: trend.map(t=>t.attendance),
+                borderColor:"#7c3aed",
+                fill:false
+            }]
+        }
+    });
+}
+function renderTable(students){
+
+    const tbody = document.getElementById("reportTable");
+    tbody.innerHTML="";
+
+    students.forEach(s=>{
+
+        let status="Good";
+        let color="green";
+
+        if(s.attendance < 75){
+            status="Low";
+            color="red";
+        }
+        else if(s.attendance < 85){
+            status="Average";
+            color="orange";
+        }
+
+        const tr=document.createElement("tr");
+
+        tr.innerHTML=`
+        <td>${s.name}</td>
+        <td>${s.roll}</td>
+        <td>${s.attendance}%</td>
+        <td style="color:${color}; font-weight:bold;">${status}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+function renderLowAttendance(students){
+
+    const container = document.getElementById("lowAttendanceList");
+    container.innerHTML="";
+
+    const low = students.filter(s=>s.attendance < 75);
+
+    if(low.length===0){
+        container.innerHTML="<p>All students are good 👍</p>";
+        return;
+    }
+
+    low.forEach(s=>{
+        const div=document.createElement("p");
+        div.style.color="red";
+        div.innerText=`${s.name} (${s.attendance}%)`;
+        container.appendChild(div);
+    });
+}
+function downloadCSV(){
+
+    let rows = [["Name","Roll","Attendance"]];
+
+    document.querySelectorAll("#reportTable tr").forEach(tr=>{
+        const cols = tr.querySelectorAll("td");
+        rows.push([
+            cols[0].innerText,
+            cols[1].innerText,
+            cols[2].innerText
+        ]);
+    });
+
+    let csv = rows.map(r=>r.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "report.csv";
+    a.click();
+}
 function setActiveLink(linkId){
 
-    document.getElementById("dashboardLink").classList.remove("active");
-    document.getElementById("myClassesLink").classList.remove("active");
-    document.getElementById("studentsLink").classList.remove("active");
-    document.getElementById("settingsLink").classList.remove("active");
+    // remove active from ALL nav items
+    document.querySelectorAll(".nav-item").forEach(link=>{
+        link.classList.remove("active");
+    });
 
-
+    // add active to clicked one
     document.getElementById(linkId).classList.add("active");
 }
 async function loadSectionData(){

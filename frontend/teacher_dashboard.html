@@ -43,7 +43,9 @@
     <i class="fas fa-users"></i> Students
   </a>
   
-    <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Reports</a>
+    <a href="#" id="reportsLink" class="nav-item" onclick="showReports()">
+  <i class="fas fa-chart-bar"></i> Reports
+</a>
     <a href="#" id="settingsLink" class="nav-item" onclick="showSettings()">
       <i class="fas fa-cog"></i> Settings
     </a>
@@ -92,7 +94,7 @@
         <option value="E">Section E</option>
     </select>
 </div>
-
+<p id="liveCount">Present: 0</p>
 
   <!-- STATS -->
   <div class="stats-grid">
@@ -176,7 +178,64 @@
 
   </div>
 </div>
+<!-- REPORTS SECTION -->
+<div id="reportsSection" style="display:none; margin-top:30px;">
 
+  <div class="reports-grid">
+
+    <!-- FILTER CARD -->
+    <div class="card report-card">
+      <h3>Reports & Analytics</h3>
+
+      <div class="report-controls">
+        <label>Section:</label>
+        <select id="reportSection" onchange="loadReports()">
+          <option value="">-- Select --</option>
+          <option value="A">Section A</option>
+          <option value="B">Section B</option>
+        </select>
+
+        <input type="date" id="reportDate" onchange="loadReports()">
+      </div>
+    </div>
+
+    <!-- CHART CARD -->
+    <div class="card report-card">
+      <h3>Attendance Trend</h3>
+      <canvas id="attendanceChart"></canvas>
+    </div>
+
+    <!-- LOW ATTENDANCE -->
+    <div class="card report-card">
+      <h3>⚠️ Low Attendance</h3>
+      <div id="lowAttendanceList"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card report-card">
+      <div style="display:flex; justify-content:space-between;">
+        <h3>Student Report</h3>
+        <button onclick="downloadCSV()" class="btn btn-primary">
+          Download
+        </button>
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>Attendance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="reportTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
 <!-- SETTINGS SECTION -->
 <div id="settingsSection" style="display:none; margin-top:40px;">
 
@@ -320,7 +379,7 @@
 });
 
   </script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="dashborad.js"></script>
 
   <!-- Student Details Modal -->

@@ -67,7 +67,7 @@ const classSchema = new mongoose.Schema({
 });
 
 const Class = mongoose.model("Class", classSchema, "Classes");
-
+global.attendanceRecords = [];
 // Student Signup API
 app.post("/student/signup", async (req, res) => {
   const newStudent = new Student(req.body);
@@ -343,17 +343,58 @@ app.post("/teacher/start-session", (req, res) => {
 });
 app.post("/student/mark-attendance", (req, res) => {
 
-  const { sessionId } = req.body;
+  const { sessionId, studentId } = req.body;
 
   const session = global.sessions.find(s => s.sessionId === sessionId);
 
   if (!session) {
-    return res.json({ success: false, message: "Invalid session" });
+    return res.json({ success: false, message: "Invalid or Expired QR" });
   }
 
-  // ✅ valid session → allow attendance
-  res.json({ success: true });
+  // ⏱️ Expiry check (2 min)
+  if (Date.now() - session.createdAt > 120000) {
+    return res.json({ success: false, message: "QR Expired" });
+  }
+
+  // 🔁 Duplicate check
+  const alreadyMarked = global.attendanceRecords.find(
+    r => r.sessionId === sessionId && r.studentId === studentId
+  );
+
+  if (alreadyMarked) {
+    return res.json({ success: false, message: "Attendance already marked" });
+  }
+
+  // ✅ Save attendance
+  global.attendanceRecords.push({
+    sessionId,
+    studentId,
+    time: new Date().toLocaleTimeString()
+  });
+
+  res.json({ success: true, time: new Date().toLocaleTimeString() });
 });
+app.get("/teacher/live-count/:sessionId", (req, res) => {
+
+  const sessionId = req.params.sessionId;
+
+  const count = global.attendanceRecords.filter(
+    r => r.sessionId === sessionId
+  ).length;
+
+  res.json({ count });
+});
+app.get("/student/history/:studentId", (req, res) => {
+
+  const studentId = req.params.studentId;
+
+  const history = global.attendanceRecords.filter(
+    r => r.studentId === studentId
+  );
+
+  res.json(history);
+});
+
 
 const PORT = process.env.PORT || 5000;
 
