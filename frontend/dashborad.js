@@ -127,23 +127,37 @@ async function startAttendance(){
 // }
 
 function startTimer(){
-attendanceTimer = setInterval(()=>{
 
-let timeLeft = expiryTime - Date.now();
+    const token = localStorage.getItem("token");
 
-if(timeLeft<=0){
-closeAttendance();
-return;
-}
+    let saved = localStorage.getItem("qrExpiry_" + token);
 
-let sec = Math.floor(timeLeft/1000);
-let m = Math.floor(sec/60);
-let s = sec%60;
+    // ✅ Fix invalid value
+    if(!saved || isNaN(saved)){
+        saved = 120000; // default 2 minutes
+    }
 
-document.getElementById("timerText").innerText =
-`Expires in ${m}:${s.toString().padStart(2,"0")}`;
+    saved = parseInt(saved);
 
-},1000);
+    expiryTime = Date.now() + saved;
+
+    attendanceTimer = setInterval(()=>{
+
+        let timeLeft = expiryTime - Date.now();
+
+        if(timeLeft <= 0){
+            closeAttendance();
+            return;
+        }
+
+        let sec = Math.floor(timeLeft / 1000);
+        let m = Math.floor(sec / 60);
+        let s = sec % 60;
+
+        document.getElementById("timerText").innerText =
+        `Expires in ${m}:${s.toString().padStart(2,"0")}`;
+
+    },1000);
 }
 
 function closeAttendance(){
@@ -199,7 +213,16 @@ async function loadTotalClasses(){
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`${BASE_URL}/teacher/total-classes`, {
+    const section = document.getElementById("sectionSelect").value;
+
+    let url = `${BASE_URL}/teacher/total-classes`;
+
+    // ✅ add section filter
+    if(section){
+        url += `?section=${section}`;
+    }
+
+    const response = await fetch(url, {
         headers: {
             Authorization: "Bearer " + token
         }
@@ -207,14 +230,8 @@ async function loadTotalClasses(){
 
     const data = await response.json();
 
-    // Update total count
     document.getElementById("totalClasses").innerText =
     data.totalClasses;
-
-
-
-
-    
 }
 
 async function loadClasses(){
@@ -366,7 +383,9 @@ async function loadSectionData(){
         document.getElementById("todaysAttendance").innerText = "0%";
         return;
     }
-    
+
+    // ✅ THIS will handle total classes correctly
+    loadTotalClasses();
 
     const token = localStorage.getItem("token");
 
@@ -381,8 +400,8 @@ async function loadSectionData(){
 
     const data = await response.json();
 
-    document.getElementById("totalClasses").innerText =
-        data.totalClasses;
+    // ❌ REMOVE THIS LINE (important)
+    // document.getElementById("totalClasses").innerText = data.totalClasses;
 
     document.getElementById("totalStudents").innerText =
         data.totalStudents;
