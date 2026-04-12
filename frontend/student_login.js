@@ -30,5 +30,6 @@ window.onload = function(){
         })
         .catch(err => console.error(err));
     });
+    localStorage.setItem("studentId", data.student.studentId);
 
 };

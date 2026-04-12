@@ -98,22 +98,31 @@ async function startAttendance(){
 // 🔥 start live count
     startLiveCount();
 }
+let liveInterval;
+
 function startLiveCount(){
 
-    setInterval(async ()=>{
+    clearInterval(liveInterval); // prevent multiple loops
+
+    liveInterval = setInterval(async ()=>{
 
         if(!window.currentSessionId) return;
 
-        const res = await fetch(
-            `${BASE_URL}/teacher/live-count/${window.currentSessionId}`
-        );
+        try{
+            const res = await fetch(
+                `${BASE_URL}/teacher/live-count/${window.currentSessionId}`
+            );
 
-        const data = await res.json();
+            const data = await res.json();
 
-        document.getElementById("liveCount").innerText =
-            "Present: " + data.count;
+            document.getElementById("liveCount").innerText =
+                "Present: " + data.count;
 
-    },3000);
+        }catch(err){
+            console.error("Live count error",err);
+        }
+
+    },2000);
 }
 
 function startTimer(){

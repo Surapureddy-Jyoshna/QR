@@ -25,18 +25,40 @@
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const session = params.get("session");
+const sessionId = params.get("session");
 
-if(!session){
-document.body.innerHTML="<h2 style='text-align:center;color:red'>Invalid Session</h2>";
+const studentId = localStorage.getItem("studentId");
+
+if(!sessionId || !studentId){
+    document.body.innerHTML="<h2>Invalid Access</h2>";
 }
 
+// 🔥 CALL BACKEND DIRECTLY (NO FORM NEEDED)
+fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance", {
+    method:"POST",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+        sessionId,
+        studentId
+    })
+})
+.then(res=>res.json())
+.then(data=>{
 
-document.getElementById("attendanceForm").onsubmit=(e)=>{
-e.preventDefault();
+    if(data.success){
+        document.body.innerHTML=`
+        <h2 style="color:green;">✅ Attendance Marked</h2>
+        <p>Time: ${data.time}</p>
+        `;
+    }else{
+        document.body.innerHTML=`
+        <h2 style="color:red;">❌ ${data.message}</h2>
+        `;
+    }
 
-document.getElementById("msg").innerText="Attendance Marked ✅";
-};
+});
 </script>
 
 </html>

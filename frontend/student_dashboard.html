@@ -66,10 +66,7 @@
 
 
 </div>
-<div id="history"></div>
-if(data.attendance < 75){
-    alert("⚠️ Your attendance is low!");
-}
+
 
 <script>
     const studentId = localStorage.getItem("studentId");
@@ -81,6 +78,9 @@ if(data.attendance < 75){
         document.getElementById("email").innerText = data.email;
         document.getElementById("studentId").innerText = data.studentId;
         document.getElementById("attendance").innerText = data.attendance;
+        if(data.attendance < 75){
+        alert("⚠️ Your attendance is low!");
+}
     })
     .catch(err => console.error(err));
 </script>
@@ -97,11 +97,12 @@ if(data.attendance < 75){
     });
     </script>
     <script>
-        fetch("http://localhost:5000/student/history/" + studentId)
-.then(res=>res.json())
-.then(data=>{
+    fetch("http://localhost:5000/student/history/" + studentId)
+    .then(res=>res.json())
+    .then(data=>{
 
     const div = document.getElementById("history");
+    div.innerHTML = "<h3>Attendance History</h3>";
 
     data.forEach(r=>{
         const p = document.createElement("p");
@@ -110,9 +111,9 @@ if(data.attendance < 75){
     });
 
 });
-    </script>
+</script>
     
-
+</body>
 </body>
 </html>
 
