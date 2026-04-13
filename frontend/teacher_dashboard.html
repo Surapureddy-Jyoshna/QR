@@ -66,7 +66,18 @@
     <button class="btn btn-primary" onclick="openClassModal()">+ Create Class</button>
 
   </header>
-
+<div id="dashboardSectionSelect" style="margin-bottom:20px;">
+    <label style="font-weight:600;">Select Section:</label>
+    <select id="sectionSelect" onchange="loadSectionData()" 
+            style="padding:8px 12px; border-radius:6px;">
+        <option value="">-- Select Section --</option>
+        <option value="A">Section A</option>
+        <option value="B">Section B</option>
+        <option value="C">Section C</option>
+        <option value="D">Section D</option>
+        <option value="E">Section E</option>
+    </select>
+</div>
   <!-- QR SECTION -->
   <div class="card qr-card">
     <h2>Live Attendance QR</h2>
@@ -82,19 +93,9 @@
     </div>
 
   </div>
-  <div style="margin-bottom:20px;">
-    <label style="font-weight:600;">Select Section:</label>
-    <select id="sectionSelect" onchange="loadSectionData()" 
-            style="padding:8px 12px; border-radius:6px;">
-        <option value="">-- Select Section --</option>
-        <option value="A">Section A</option>
-        <option value="B">Section B</option>
-        <option value="C">Section C</option>
-        <option value="D">Section D</option>
-        <option value="E">Section E</option>
-    </select>
+<div id="attendanceSection">
+    <div id="attendanceList" style="margin-top:15px;"></div>
 </div>
-<div id="attendanceList" style="margin-top:15px;"></div>
   <!-- STATS -->
   <div class="stats-grid">
 

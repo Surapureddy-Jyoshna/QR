@@ -7,6 +7,8 @@ function hideAllSections(){
     document.getElementById("studentsSection").style.display = "none";
     document.getElementById("settingsSection").style.display = "none"; 
     document.getElementById("reportsSection").style.display = "none";
+    document.getElementById("dashboardSectionSelect").style.display = "none";
+    document.getElementById("attendanceSection").style.display = "none";
 }
 
 window.onload = async function(){
@@ -56,6 +58,7 @@ window.onload = async function(){
     }catch(err){
         console.error("Dashboard Load Error:",err);
     }
+    document.getElementById("dashboardSectionSelect").style.display = "block";
 };
 
 
@@ -374,6 +377,7 @@ function showDashboard(){
 
     document.querySelector(".qr-card").style.display = "block";
     document.querySelector(".stats-grid").style.display = "grid";
+    document.getElementById("dashboardSectionSelect").style.display = "block";
 }
 
 function showReports(){
@@ -518,8 +522,7 @@ async function loadSectionData(){
     if(!section){
         document.getElementById("totalClasses").innerText = "0";
         document.getElementById("totalStudents").innerText = "0";
-        document.getElementById("todaysAttendance").innerText =
-    data.todaysAttendance;
+        document.getElementById("todaysAttendance").innerText ="0";
         return;
     }
 
@@ -546,7 +549,7 @@ async function loadSectionData(){
         data.totalStudents;
 
     document.getElementById("todaysAttendance").innerText =
-        data.todaysAttendance + "%";
+        data.todaysAttendance ;
 }
 
 
