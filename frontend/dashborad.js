@@ -403,11 +403,54 @@ function showDashboard(){
     document.getElementById("dashboardSectionSelect").style.display = "block";
 }
 
-function showReports(){
+async function showReports(){
     hideAllSections();
     setActiveLink("reportsLink");
 
     document.getElementById("reportsSection").style.display="block";
+
+    const section = document.getElementById("sectionSelect").value;
+
+    if(!section){
+        alert("Select section first");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+        `${BASE_URL}/teacher/report/${section}`,
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const students = await res.json();
+
+    const tbody = document.getElementById("reportTable");
+    tbody.innerHTML = "";
+
+    students.forEach(s => {
+
+        let color = "green";
+        if(s.status === "Low") color = "red";
+        else if(s.status === "Average") color = "orange";
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${s.name}</td>
+            <td>${s.roll}</td>
+            <td>${s.attendance}%</td>
+            <td style="color:${color}; font-weight:bold;">
+                ${s.status}
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
 let chart;
 

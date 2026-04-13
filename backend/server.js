@@ -539,3 +539,71 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.get("/teacher/report/:section", authenticateToken, async (req, res) => {
+
+  const section = req.params.section;
+
+  try {
+
+    // 📌 TOTAL CLASSES
+    const totalClasses = await Class.countDocuments({ section });
+
+    // 📌 GET ALL STUDENTS (from CSV)
+    const students = [];
+
+    fs.createReadStream(__dirname + "/CSE.csv")
+      .pipe(csv())
+      .on("data", (data) => {
+        if(data.Section === section){
+          students.push({
+            studentId: data["Student_ID"]?.trim(),
+            name: data["Name"]?.trim(),
+            roll: data["RollNo"]?.trim()
+          });
+        }
+      })
+      .on("end", async () => {
+
+        // 📌 GET ALL ATTENDANCE RECORDS
+        const records = await Attendance.find({ section });
+
+        const result = students.map(student => {
+
+          let attended = 0;
+
+          records.forEach(rec => {
+            const found = rec.students.some(
+              s => s.studentId === student.studentId
+            );
+            if(found) attended++;
+          });
+
+          const percentage = totalClasses === 0
+            ? 0
+            : Math.round((attended / totalClasses) * 100);
+
+          let status = "Good";
+
+          if(percentage < 75){
+            status = "Low";
+          } else if(percentage < 85){
+            status = "Average";
+          }
+
+          return {
+            name: student.name,
+            roll: student.roll,
+            attendance: percentage,
+            status
+          };
+        });
+
+        res.json(result);
+
+      });
+
+  } catch(err){
+    console.error(err);
+    res.status(500).json({ message: "Error generating report" });
+  }
+});
