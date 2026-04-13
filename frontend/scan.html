@@ -35,8 +35,14 @@ if(!sessionId){
 document.getElementById("attendanceForm").onsubmit = async (e)=>{
     e.preventDefault();
 
-    const name = document.getElementById("studentName").value;
-    const studentId = document.getElementById("studentId").value;
+    const name = document.getElementById("studentName").value.trim();
+const studentId = document.getElementById("studentId").value.trim();
+
+if(!name || !studentId){
+    document.getElementById("msg").innerHTML =
+    `<span style="color:red;">❌ Enter valid details</span>`;
+    return;
+}
 
     const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
         method:"POST",

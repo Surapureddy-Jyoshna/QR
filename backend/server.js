@@ -348,12 +348,16 @@ app.post("/teacher/start-session", (req, res) => {
 
   // store session (temporary memory)
   global.sessions = global.sessions || [];
-  const { section }= req.body;
+  const { section } = req.body;
+
+// ✅ auto date
+const date = new Date().toISOString().split("T")[0];
   global.sessions.push({
-    sessionId,
-    createdAt: Date.now(),
-    section
-  });
+  sessionId,
+  createdAt: Date.now(),
+  section,
+  date
+});
 
   res.json({ sessionId });
 });
@@ -375,7 +379,7 @@ app.post("/student/mark-attendance", async (req, res) => {
     return res.json({ success: false, message: "Invalid QR" });
   }
 
-  const date = new Date().toISOString().split("T")[0];
+  const date = session.date;
   const section = session.section;
 
   // 🔍 Find existing attendance for same date + section
@@ -422,6 +426,7 @@ app.post("/student/mark-attendance", async (req, res) => {
     success: true,
     time: currentTime
   });
+  console.log(req.body);
 });
 app.get("/teacher/live-count/:sessionId", (req, res) => {
 

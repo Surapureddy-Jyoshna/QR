@@ -75,7 +75,7 @@ const res = await fetch(`${BASE_URL}/teacher/start-session`, {
     Authorization: "Bearer " + token,
     "Content-Type": "application/json"
   },
-  body: JSON.stringify({ section })
+  body: JSON.stringify({ section, date })
 });
 
   const data = await res.json();
