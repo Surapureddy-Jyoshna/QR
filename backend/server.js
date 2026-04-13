@@ -431,12 +431,24 @@ app.post("/student/mark-attendance", async (req, res) => {
 
   // ✅ Live count fix
   global.attendanceRecords = global.attendanceRecords || [];
-  global.attendanceRecords.push({
-    sessionId,
-    studentId,
-    name,
-    time: currentTime
-  });
+  const userIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+// ❌ block multiple from same IP
+const alreadyFromIP = global.attendanceRecords.some(
+  r => r.sessionId === sessionId && r.ip === userIP
+);
+
+if(alreadyFromIP){
+  return res.json({ success: false, message: "Already marked from this device" });
+}
+
+global.attendanceRecords.push({
+  sessionId,
+  studentId,
+  name,
+  time: currentTime,
+  ip: userIP
+});
 
   res.json({
     success: true,

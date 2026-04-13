@@ -36,14 +36,13 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
     e.preventDefault();
 
     const name = document.getElementById("studentName").value.trim();
-const studentId = document.getElementById("studentId").value.trim();
+    const studentId = document.getElementById("studentId").value.trim();
 
-if(!name || !studentId){
-    document.getElementById("msg").innerHTML =
-    `<span style="color:red;">❌ Enter valid details</span>`;
-    return;
-}
-
+    if(!name || !studentId){
+        document.getElementById("msg").innerHTML =
+        `<span style="color:red;">❌ Enter valid details</span>`;
+        return;
+    }
     const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
         method:"POST",
         headers:{
@@ -59,6 +58,10 @@ if(!name || !studentId){
     const data = await res.json();
 
     if(data.success){
+
+    // ✅ mark this device as used
+        localStorage.setItem("attendance_" + sessionId, "true");
+
         document.getElementById("msg").innerHTML =
         `<span style="color:green;">✅ Marked at ${data.time}</span>`;
     }else{
@@ -66,6 +69,14 @@ if(!name || !studentId){
         `<span style="color:red;">❌ ${data.message}</span>`;
     }
 };
+// 🚫 prevent multiple attendance from same device
+const alreadyMarked = localStorage.getItem("attendance_" + sessionId);
+
+if(alreadyMarked){
+    document.getElementById("msg").innerHTML =
+    `<span style="color:red;">❌ Attendance already marked from this device</span>`;
+    return;
+}
 </script>
 
 </html>
