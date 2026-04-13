@@ -69,13 +69,18 @@ async function startAttendance(){
 
   const section = document.getElementById("sectionSelect").value;
 
+if(!section){
+  alert("Please select section");
+  return;
+}
+
 const res = await fetch(`${BASE_URL}/teacher/start-session`, {
   method: "POST",
   headers: {
     Authorization: "Bearer " + token,
     "Content-Type": "application/json"
   },
-  body: JSON.stringify({ section, date })
+  body: JSON.stringify({ section })
 });
 
   const data = await res.json();
