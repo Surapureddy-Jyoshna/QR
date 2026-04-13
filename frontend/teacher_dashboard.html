@@ -178,51 +178,53 @@
 
   </div>
 </div>
-<!-- REPORTS SECTION -->
+<!--Reports section-->
 <div id="reportsSection" style="display:none; margin-top:30px;">
 
-  <div class="reports-grid">
-     <div style="margin-bottom:15px;">
-  <label style="font-weight:600;">Select Section:</label>
-  <select id="reportSectionSelect" 
-          onchange="loadReportBySection()"
-          style="padding:8px 12px; border-radius:6px;">
-      
-      <option value="">-- Select Section --</option>
-      <option value="A">Section A</option>
-      <option value="B">Section B</option>
-      <option value="C">Section C</option>
-      <option value="D">Section D</option>
-      <option value="E">Section E</option>
-  </select>
-</div>
-    <!-- TABLE -->
-    <div class="card report-card">
-      <div style="display:flex; justify-content:space-between;">
-        <h3>Student Report</h3>
-        <button onclick="downloadCSV()" class="btn btn-primary">
-          Download
-        </button>
-      </div>
+  <!-- SECTION SELECT -->
+  <div style="margin-bottom:15px;">
+    <label style="font-weight:600;">Select Section:</label>
+    <select id="reportSectionSelect" 
+            onchange="loadReportBySection()"
+            style="padding:8px 12px; border-radius:6px;">
+        
+        <option value="">-- Select Section --</option>
+        <option value="A">Section A</option>
+        <option value="B">Section B</option>
+        <option value="C">Section C</option>
+        <option value="D">Section D</option>
+        <option value="E">Section E</option>
+    </select>
+  </div>
 
-      <table class="report-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Roll</th>
-            <th>Attendance</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="reportTable"></tbody>
-      </table>
-    </div>
-    <!-- LOW ATTENDANCE -->
-    <div class="card report-card">
-      <h3>⚠️ Low Attendance</h3>
-      <div id="lowAttendanceList"></div>
+  <!-- STUDENT REPORT (FULL WIDTH LEFT) -->
+  <div class="card report-card" style="width:100%; margin-bottom:20px;">
+    
+    <div style="display:flex; justify-content:space-between;">
+      <h3>Student Report</h3>
+      <button onclick="downloadCSV()" class="btn btn-primary">
+        Download
+      </button>
     </div>
 
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Roll</th>
+          <th>Attendance</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="reportTable"></tbody>
+    </table>
+
+  </div>
+
+  <!-- LOW ATTENDANCE BELOW -->
+  <div class="card report-card">
+    <h3>⚠️ Low Attendance</h3>
+    <div id="lowAttendanceList"></div>
   </div>
 
 </div>
