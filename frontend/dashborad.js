@@ -403,18 +403,17 @@ function showDashboard(){
     document.getElementById("dashboardSectionSelect").style.display = "block";
 }
 
-async function showReports(){
+function showReports(){
     hideAllSections();
     setActiveLink("reportsLink");
 
     document.getElementById("reportsSection").style.display="block";
+}
+async function loadReportBySection(){
 
-    const section = document.getElementById("sectionSelect").value;
+    const section = document.getElementById("reportSectionSelect").value;
 
-    if(!section){
-        alert("Select section first");
-        return;
-    }
+    if(!section) return;
 
     const token = localStorage.getItem("token");
 

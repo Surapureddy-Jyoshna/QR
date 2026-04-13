@@ -182,7 +182,20 @@
 <div id="reportsSection" style="display:none; margin-top:30px;">
 
   <div class="reports-grid">
-
+     <div style="margin-bottom:15px;">
+  <label style="font-weight:600;">Select Section:</label>
+  <select id="reportSectionSelect" 
+          onchange="loadReportBySection()"
+          style="padding:8px 12px; border-radius:6px;">
+      
+      <option value="">-- Select Section --</option>
+      <option value="A">Section A</option>
+      <option value="B">Section B</option>
+      <option value="C">Section C</option>
+      <option value="D">Section D</option>
+      <option value="E">Section E</option>
+  </select>
+</div>
     <!-- TABLE -->
     <div class="card report-card">
       <div style="display:flex; justify-content:space-between;">
