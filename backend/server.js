@@ -80,7 +80,22 @@ const attendanceSchema = new mongoose.Schema({
 });
 
 const Attendance = mongoose.model("Attendance", attendanceSchema);
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // meters
 
+  const dLat = (lat2 - lat1) * Math.PI/180;
+  const dLon = (lon2 - lon1) * Math.PI/180;
+
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c;
+}
 
 global.attendanceRecords = [];
 // Student Signup API
@@ -395,13 +410,33 @@ app.get("/teacher/attendance/:section/:date", async (req,res)=>{
 });
 app.post("/student/mark-attendance", async (req, res) => {
 
-  const { sessionId, studentId, name, deviceId } = req.body;
+  const { sessionId, studentId, name, deviceId, lat, lng} = req.body;
 
   const session = global.sessions.find(s => s.sessionId === sessionId);
-
   if (!session) {
-    return res.json({ success: false, message: "Invalid QR" });
+  return res.json({ success: false, message: "Invalid QR" });
+}
+
+// 🔥 LOCATION CHECK
+if(session.lat && session.lng && lat && lng){
+
+  const distance = getDistance(
+    session.lat,
+    session.lng,
+    lat,
+    lng
+  );
+
+  console.log("Distance:", distance);
+
+  if(distance > 100){
+    return res.json({
+      success: false,
+      message: "You are not in class location ❌"
+    });
   }
+}
+  
 
   if (!session.active) {
     return res.json({ success: false, message: "Attendance Closed" });

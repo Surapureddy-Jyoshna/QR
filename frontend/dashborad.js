@@ -68,42 +68,48 @@ async function startAttendance(){
 
   closeAttendance();
 
-  const token = localStorage.getItem("token");
-
   const section = document.getElementById("sectionSelect").value;
-  let teacherLat, teacherLng;
 
-navigator.geolocation.getCurrentPosition(
-  (pos) => {
-    teacherLat = pos.coords.latitude;
-    teacherLng = pos.coords.longitude;
-
-    startSessionWithLocation(teacherLat, teacherLng);
-  },
-  (err) => {
-    alert("Location access required!");
+  if(!section){
+    alert("Please select section");
+    return;
   }
-);
 
-return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const teacherLat = pos.coords.latitude;
+      const teacherLng = pos.coords.longitude;
 
-if(!section){
-  alert("Please select section");
-  return;
+      startSessionWithLocation(teacherLat, teacherLng);
+    },
+    (err) => {
+      alert("Location access required!");
+    }
+  );
 }
+async function startSessionWithLocation(lat, lng){
 
-const res = await fetch(`${BASE_URL}/teacher/start-session`, {
-  method: "POST",
-  headers: {
-    Authorization: "Bearer " + token,
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ section })
-});
+  const token = localStorage.getItem("token");
+  const section = document.getElementById("sectionSelect").value;
+
+  if(!section){
+    alert("Please select section");
+    return;
+  }
+
+  const res = await fetch(`${BASE_URL}/teacher/start-session`, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ section, lat, lng })
+  });
 
   const data = await res.json();
-  const sessionId = data.sessionId; // ✅ real session from backend
+  const sessionId = data.sessionId;
 
+  // ✅ GENERATE QR (MISSING PART)
   const qrWrapper = document.getElementById("qrWrapper");
   const qrDiv = document.getElementById("qrcode");
 
@@ -121,27 +127,7 @@ const res = await fetch(`${BASE_URL}/teacher/start-session`, {
   startTimer();
   window.currentSessionId = sessionId;
 
-// 🔥 start live count
-    startLiveCount();
-}
-async function startSessionWithLocation(lat, lng){
-
-  const token = localStorage.getItem("token");
-  const section = document.getElementById("sectionSelect").value;
-
-  const res = await fetch(`${BASE_URL}/teacher/start-session`, {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + token,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ section, lat, lng })
-  });
-
-  const data = await res.json();
-  const sessionId = data.sessionId;
-
-  // (keep your existing QR code logic here)
+  startLiveCount();
 }
 let liveInterval;
 
