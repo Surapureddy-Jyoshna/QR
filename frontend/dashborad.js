@@ -134,7 +134,7 @@ let liveInterval;
 
 function startLiveCount(){
 
-    clearInterval(liveInterval); // prevent multiple loops
+    clearInterval(liveInterval);
 
     liveInterval = setInterval(async ()=>{
 
@@ -147,15 +147,17 @@ function startLiveCount(){
 
             const data = await res.json();
 
+            // 🔥 ADD THIS LINE (IMPORTANT)
+            loadSectionData();   // ✅ refresh today's attendance
 
         }catch(err){
             console.error("Live count error",err);
         }
 
     },2000);
+
     loadAttendanceList();
 }
-
 function startTimer(){
 
     const token = localStorage.getItem("token");
@@ -728,4 +730,5 @@ async function loadAttendanceList(){
         p.innerText = `${s.name} (${s.studentId}) - ${s.time}`;
         container.appendChild(p);
     });
+    loadSectionData();   // ✅ refresh stats
 }
