@@ -743,8 +743,7 @@ async function loadLowAttendance(){
 
     low.forEach(s => {
         const p = document.createElement("p");
-        p.style.color = "red";
-        p.innerText = `${s.name} (${s.attendance}%)`;
+        p.innerHTML = `<span>⚠️ ${s.name}</span> <span>${s.attendance}%</span>`;
         container.appendChild(p);
     });
 }
