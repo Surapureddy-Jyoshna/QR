@@ -417,10 +417,19 @@ app.post("/student/mark-attendance", async (req, res) => {
 
   const { sessionId, studentId, name, deviceId, lat, lng} = req.body;
 
+console.log("Incoming sessionId:", sessionId);
+
 const session = await Session.findOne({ sessionId });
 
+if (!session) {
+  return res.json({
+    success: false,
+    message: "Session not found. Please restart attendance."
+  });
+}
+
 // 🔥 LOCATION CHECK
-if(session.lat && session.lng && lat && lng){
+if(session && session.lat && session.lng && lat && lng){
 
   const distance = getDistance(
     session.lat,
@@ -440,7 +449,7 @@ if(session.lat && session.lng && lat && lng){
 }
   
 
-  if (!session.active) {
+  if (!session || !session.active) {
     return res.json({ success: false, message: "Attendance Closed" });
   }
 
