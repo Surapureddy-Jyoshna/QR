@@ -50,15 +50,15 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
 
     document.getElementById("msg").innerHTML = "⏳ Getting location...";
 
-    navigator.geolocation.getCurrentPosition(async (pos)=>{
+    navigator.geolocation.getCurrentPosition(
+async (pos) => {
 
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-        try {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
 
-            const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
+    try {
+
+        const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -70,37 +70,40 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
                 deviceId,
                 lat,
                 lng
-            }),
-            signal: controller.signal
+            })
         });
-        clearTimeout(timeout);
-            const data = await res.json();
 
-            console.log("Response:", data);
+        const data = await res.json();
 
-            if(data.success){
-                document.getElementById("msg").innerHTML =
-                `<span style="color:green;">✅ Marked at ${data.time}</span>`;
-            }else{
-                document.getElementById("msg").innerHTML =
-                `<span style="color:red;">❌ ${data.message}</span>`;
-            }
+        console.log("Response:", data);
 
-        } catch(err){
-
-            console.error("FETCH ERROR:", err);
-
+        if(data.success){
             document.getElementById("msg").innerHTML =
-            `<span style="color:red;">❌ Server error</span>`;
+            `<span style="color:green;">✅ Marked at ${data.time}</span>`;
+        }else{
+            document.getElementById("msg").innerHTML =
+            `<span style="color:red;">❌ ${data.message}</span>`;
         }
 
-    }, (err)=>{
+    } catch(err){
 
-        console.error("LOCATION ERROR:", err);
+        console.error("FETCH ERROR:", err);
 
         document.getElementById("msg").innerHTML =
-        `<span style="color:red;">❌ Location permission denied</span>`;
-    });
+        `<span style="color:red;">❌ Server not reachable</span>`;
+    }
+
+},
+(err) => {
+    document.getElementById("msg").innerHTML =
+    `<span style="color:red;">❌ Location permission denied</span>`;
+},
+{
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+}
+);
 };
 
 </script>
