@@ -830,6 +830,8 @@
   border: 1px solid #ccc;
   background: #fff;
   cursor: pointer;
+
+  width: 90px;   /* ✅ ADD THIS */
 }
 
 .small-select:hover {
