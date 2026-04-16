@@ -419,8 +419,7 @@ app.get("/teacher/attendance/:section/:date", async (req,res)=>{
 });
 app.post("/student/mark-attendance", async (req, res) => {
 
-  const { sessionId, studentId, name, deviceId, lat, lng} = req.body;
-
+ const { sessionId, studentId, name, deviceId, lat, lng, accuracy } = req.body;
 console.log("Incoming sessionId:", sessionId);
 
 const session = await Session.findOne({ sessionId });
@@ -432,8 +431,24 @@ if (!session) {
   });
 }
 
-// 🔥 LOCATION CHECK
-if(session && session.lat && session.lng && lat && lng){
+// 🔥 LOCATION CHECK (FIXED)
+
+// ✅ Accuracy check (ADD THIS FIRST)
+if(req.body.accuracy && req.body.accuracy > 100){
+  return res.json({
+    success: false,
+    message: "Low GPS accuracy. Move to open area."
+  });
+}
+
+// ✅ Proper condition check (FIXED)
+if(
+  session &&
+  session.lat !== undefined &&
+  session.lng !== undefined &&
+  lat !== undefined &&
+  lng !== undefined
+){
 
   const distance = getDistance(
     session.lat,
@@ -442,16 +457,20 @@ if(session && session.lat && session.lng && lat && lng){
     lng
   );
 
+  // ✅ DEBUG (temporary)
+  console.log("Teacher:", session.lat, session.lng);
+  console.log("Student:", lat, lng);
   console.log("Distance:", distance);
+  console.log("Accuracy:", req.body.accuracy);
 
+  // ✅ Strict 100m check
   if(distance > 100){
     return res.json({
       success: false,
-      message: "You are not in class location ❌"
+      message: `You are ${Math.round(distance)} meters away`
     });
   }
 }
-  
 
   if (!session || !session.active) {
     return res.json({ success: false, message: "Attendance Closed" });

@@ -76,16 +76,24 @@ async function startAttendance(){
   }
 
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const teacherLat = pos.coords.latitude;
-      const teacherLng = pos.coords.longitude;
+  (pos) => {
+    const teacherLat = pos.coords.latitude;
+    const teacherLng = pos.coords.longitude;
+    const accuracy = pos.coords.accuracy;
 
-      startSessionWithLocation(teacherLat, teacherLng);
-    },
-    (err) => {
-      alert("Location access required!");
-    }
-  );
+    console.log("Teacher Accuracy:", accuracy);
+
+    startSessionWithLocation(teacherLat, teacherLng);
+  },
+  (err) => {
+    alert("Location access required!");
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  }
+);
 }
 async function startSessionWithLocation(lat, lng){
 

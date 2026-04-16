@@ -54,7 +54,10 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
 async (pos) => {
 
     const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+const lng = pos.coords.longitude;
+const accuracy = pos.coords.accuracy;
+
+console.log("Student Accuracy:", accuracy);
 
     try {
 
@@ -64,13 +67,14 @@ async (pos) => {
                 "Content-Type":"application/json"
             },
             body: JSON.stringify({
-                sessionId,
-                studentId,
-                name,
-                deviceId,
-                lat,
-                lng
-            })
+    sessionId,
+    studentId,
+    name,
+    deviceId,
+    lat,
+    lng,
+    accuracy   // ✅ ADD THIS
+})
         });
 
         const data = await res.json();
