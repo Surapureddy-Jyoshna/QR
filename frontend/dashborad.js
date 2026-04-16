@@ -1,4 +1,4 @@
-const BASE_URL = "https://qr-attendance-1-odo4.onrender.com";
+const BASE_URL = "https://qr-j7r8.onrender.com";
 let currentSection = "";
 function hideAllSections(){
     document.querySelector(".qr-card").style.display = "none";
@@ -76,24 +76,16 @@ async function startAttendance(){
   }
 
   navigator.geolocation.getCurrentPosition(
-  (pos) => {
-    const teacherLat = pos.coords.latitude;
-    const teacherLng = pos.coords.longitude;
-    const accuracy = pos.coords.accuracy;
+    (pos) => {
+      const teacherLat = pos.coords.latitude;
+      const teacherLng = pos.coords.longitude;
 
-    console.log("Teacher Accuracy:", accuracy);
-
-    startSessionWithLocation(teacherLat, teacherLng);
-  },
-  (err) => {
-    alert("Location access required!");
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 0
-  }
-);
+      startSessionWithLocation(teacherLat, teacherLng);
+    },
+    (err) => {
+      alert("Location access required!");
+    }
+  );
 }
 async function startSessionWithLocation(lat, lng){
 
@@ -155,9 +147,8 @@ function startLiveCount(){
 
             const data = await res.json();
 
-            // ✅ Update ONLY today's attendance card
-            document.getElementById("todaysAttendance").innerText =
-                data.count;
+            // 🔥 ADD THIS LINE (IMPORTANT)
+            loadSectionData();   // ✅ refresh today's attendance
 
         }catch(err){
             console.error("Live count error",err);
@@ -165,6 +156,7 @@ function startLiveCount(){
 
     },2000);
 
+    loadAttendanceList();
 }
 function startTimer(){
 
@@ -202,6 +194,7 @@ function startTimer(){
 
 async function closeAttendance(){
 
+  // 🔥 call backend to close session
   if(window.currentSessionId){
     await fetch(`${BASE_URL}/teacher/close-session`, {
       method: "POST",
@@ -215,14 +208,9 @@ async function closeAttendance(){
   }
 
   clearInterval(attendanceTimer);
-  clearInterval(liveInterval); // ✅ ADD THIS
-
   document.getElementById("qrWrapper").style.display="none";
   document.getElementById("qrcode").innerHTML="";
   document.getElementById("timerText").innerText="";
-
-  // ✅ Reload actual DB attendance
-  loadSectionData();
 }
 
 function openClassModal(){

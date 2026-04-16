@@ -1,4 +1,4 @@
-const BASE_URL = "https://qr-attendance-1-odo4.onrender.com";
+const BASE_URL = "https://qr-j7r8.onrender.com";
 document.getElementById("studentSignupForm")
 .addEventListener("submit", function(e){
 
