@@ -1,4 +1,4 @@
-const BASE_URL = "https://qr-j7r8.onrender.com";
+const BASE_URL = "https://qr-1-jep5.onrender.com";
 let currentSection = "";
 function hideAllSections(){
     document.querySelector(".qr-card").style.display = "none";
