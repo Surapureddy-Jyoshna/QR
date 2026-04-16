@@ -63,7 +63,9 @@
     </div>
     <button id="studentLogout" class="logout-btn">Logout</button>
 
-
+    <div id="history" style="margin-top:20px;">
+    <h3>Attendance History</h3>
+</div>
 
 </div>
 
@@ -71,7 +73,7 @@
 <script>
     const studentId = localStorage.getItem("studentId");
 
-    fetch("http://localhost:5000/student/" + studentId)
+    fetch("https://qr-1-jep5.onrender.com/student/" + studentId)
     .then(res => res.json())
     .then(data => {
         document.getElementById("name").innerText = data.name;
@@ -97,18 +99,19 @@
     });
     </script>
     <script>
-    fetch("http://localhost:5000/student/history/" + studentId)
-    .then(res=>res.json())
-    .then(data=>{
+    fetch("https://qr-1-jep5.onrender.com/student/history/" + studentId)
+.then(res=>res.json())
+.then(data=>{
 
     const div = document.getElementById("history");
-    div.innerHTML = "<h3>Attendance History</h3>";
 
     data.forEach(r=>{
         const p = document.createElement("p");
         p.innerText = `✔ ${r.time}`;
         div.appendChild(p);
     });
+
+});
 
 });
 </script>

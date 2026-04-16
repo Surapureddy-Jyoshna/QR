@@ -335,7 +335,9 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
               teacherId: req.user.id,
               section: section
           });
-           const today = new Date().toISOString().split("T")[0];
+           const today = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Asia/Kolkata"
+});
 
             const attendanceRecord = await Attendance.findOne({
                 teacherId: req.user.id,   // ✅ ADD THIS
@@ -384,7 +386,9 @@ app.post("/teacher/start-session", authenticateToken, async (req, res) => {
 
   const sessionId = "SESSION_" + Date.now();
   const { section, lat, lng } = req.body;
-  const date = new Date().toISOString().split("T")[0];
+  const date = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Asia/Kolkata"
+});
 
   await Session.create({
     sessionId,
