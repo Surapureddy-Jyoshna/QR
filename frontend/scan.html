@@ -61,7 +61,9 @@ console.log("Student Accuracy:", accuracy);
 
     try {
 
-        const res = await fetch("https://qr-attendance-1-odo4.onrender.com/student/mark-attendance",{
+        const BASE_URL = "https://qr-1-jep5.onrender.com";
+
+const res = await fetch(`${BASE_URL}/student/mark-attendance`,{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -104,7 +106,7 @@ console.log("Student Accuracy:", accuracy);
 },
 {
     enableHighAccuracy: true,
-    timeout: 10000,
+    timeout: 20000,
     maximumAge: 0
 }
 );

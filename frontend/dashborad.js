@@ -147,8 +147,7 @@ function startLiveCount(){
 
             const data = await res.json();
 
-            // 🔥 ADD THIS LINE (IMPORTANT)
-            loadSectionData();   // ✅ refresh today's attendance
+            
 
         }catch(err){
             console.error("Live count error",err);
