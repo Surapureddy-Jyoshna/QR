@@ -431,15 +431,6 @@ if (!session) {
   });
 }
 
-// 🔥 LOCATION CHECK (FIXED)
-
-// ✅ Accuracy check (ADD THIS FIRST)
-if(req.body.accuracy && req.body.accuracy > 100){
-  return res.json({
-    success: false,
-    message: "Low GPS accuracy. Move to open area."
-  });
-}
 
 // ✅ Proper condition check (FIXED)
 if(
@@ -451,24 +442,25 @@ if(
 ){
 
   const distance = getDistance(
-    session.lat,
-    session.lng,
-    lat,
-    lng
-  );
+  session.lat,
+  session.lng,
+  lat,
+  lng
+);
 
-  // ✅ DEBUG (temporary)
-  console.log("Teacher:", session.lat, session.lng);
-  console.log("Student:", lat, lng);
-  console.log("Distance:", distance);
-  console.log("Accuracy:", req.body.accuracy);
+// ✅ LOG FOR DEBUG
+console.log("Distance:", distance);
+console.log("Accuracy:", accuracy);
 
-  // ✅ Strict 100m check
-  if(distance > (accuracy + 50)){
-    return res.json({
-      success: false,
-      message: `You are ${Math.round(distance)} meters away`
-    });
+// ✅ FINAL RELAXED CONDITION
+const allowedRange = Math.max(accuracy || 0, 100) + 50;
+
+if(distance > allowedRange){
+  return res.json({
+    success: false,
+    message: `You are ${Math.round(distance)} meters away`
+  });
+}
   }
 }
 
