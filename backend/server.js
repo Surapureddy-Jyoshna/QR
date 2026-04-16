@@ -420,16 +420,16 @@ app.get("/teacher/attendance/:section/:date", async (req,res)=>{
 app.post("/student/mark-attendance", async (req, res) => {
 
  const { sessionId, studentId, name, deviceId, lat, lng, accuracy } = req.body;
-console.log("Incoming sessionId:", sessionId);
+  console.log("Incoming sessionId:", sessionId);
 
-const session = await Session.findOne({ sessionId });
+  const session = await Session.findOne({ sessionId });
 
-if (!session) {
-  return res.json({
-    success: false,
-    message: "Session not found. Please restart attendance."
-  });
-}
+  if (!session) {
+    return res.json({
+      success: false,
+      message: "Session not found. Please restart attendance."
+   });
+  }
 
 
 // ✅ Proper condition check (FIXED)
@@ -446,23 +446,23 @@ if(
   session.lng,
   lat,
   lng
-);
+  );
 
 // ✅ LOG FOR DEBUG
-console.log("Distance:", distance);
-console.log("Accuracy:", accuracy);
+  console.log("Distance:", distance);
+  console.log("Accuracy:", accuracy);
 
 // ✅ FINAL RELAXED CONDITION
-const allowedRange = Math.max(accuracy || 0, 100) + 50;
+  const allowedRange = Math.max(accuracy || 0, 100) + 50;
 
-if(distance > allowedRange){
-  return res.json({
-    success: false,
-    message: `You are ${Math.round(distance)} meters away`
-  });
-}
+  if(distance > allowedRange){
+    return res.json({
+      success: false,
+      message: `You are ${Math.round(distance)} meters away`
+    });
   }
-}
+  }
+
 
   if (!session || !session.active) {
     return res.json({ success: false, message: "Attendance Closed" });
