@@ -464,7 +464,7 @@ if(
   console.log("Accuracy:", req.body.accuracy);
 
   // ✅ Strict 100m check
-  if(distance > 100){
+  if(distance > (accuracy + 50)){
     return res.json({
       success: false,
       message: `You are ${Math.round(distance)} meters away`

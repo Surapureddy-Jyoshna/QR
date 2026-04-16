@@ -706,7 +706,7 @@ async function loadAttendanceList(){
         p.innerText = `${s.name} (${s.studentId}) - ${s.time}`;
         container.appendChild(p);
     });
-    loadSectionData();   // ✅ refresh stats
+    
 }
 async function loadLowAttendance(){
 
