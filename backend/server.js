@@ -479,11 +479,22 @@ if (alreadyFromDevice) {
   return res.json({ success: false, message: "Already marked from this device" });
 }
 
-  let record = await Attendance.findOne({
-  teacherId: session.teacherId,
-  date,
-  section
-});
+  let record = await Attendance.findOneAndUpdate(
+  {
+    teacherId: session.teacherId,
+    date,
+    section
+  },
+  {
+    $setOnInsert: {
+      teacherId: session.teacherId,
+      date,
+      section,
+      students: []
+    }
+  },
+  { new: true, upsert: true }
+);
 
   if (!record) {
     record = new Attendance({
@@ -519,13 +530,7 @@ if (alreadyFromDevice) {
 
   await record.save();
 
-  global.attendanceRecords.push({
-  sessionId,
-  studentId,
-  name,
-  time: currentTime,
-  deviceId
-});
+ 
 
   res.json({
     success: true,
