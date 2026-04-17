@@ -99,21 +99,24 @@
     });
     </script>
     <script>
-    fetch("https://qr-1-jep5.onrender.com/student/history/" + studentId)
-.then(res=>res.json())
-.then(data=>{
+    fetch("https://qr-1-jep5.onrender.com/student/attendance/" + studentId)
+.then(res => res.json())
+.then(data => {
+
+    document.getElementById("attendance").innerText = data.percentage;
 
     const div = document.getElementById("history");
+    div.innerHTML = "<h3>Attendance History</h3>";
 
-    data.forEach(r=>{
+    data.history.forEach(r=>{
         const p = document.createElement("p");
-        p.innerText = `✔ ${r.time}`;
+        p.innerText = `📅 ${r.date} | ⏰ ${r.time} | Sec ${r.section}`;
         div.appendChild(p);
     });
 
 });
 
-});
+
 </script>
     
 </body>

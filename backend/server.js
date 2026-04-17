@@ -525,14 +525,23 @@ if (alreadyFromDevice) {
   second: "2-digit"
 });
 
-  // ✅ save attendance
-  record.students.push({
-    studentId,
-    name,
-    time: currentTime
-  });
-
-  await record.save();
+  await Attendance.updateOne(
+  {
+    teacherId: session.teacherId,
+    date,
+    section,
+    "students.studentId": { $ne: studentId }
+  },
+  {
+    $push: {
+      students: {
+        studentId,
+        name,
+        time: currentTime
+      }
+    }
+  }
+);
 
  
 
@@ -540,6 +549,13 @@ if (alreadyFromDevice) {
     success: true,
     time: currentTime
   });
+  global.attendanceRecords.push({
+  sessionId,
+  studentId,
+  name,
+  time: currentTime,
+  deviceId
+});
 
 });
 app.get("/teacher/live-count/:sessionId", (req, res) => {
@@ -649,4 +665,41 @@ app.get("/teacher/report/:section", authenticateToken, async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Error generating report" });
   }
+});
+app.get("/student/attendance/:studentId", async (req, res) => {
+
+  const studentId = req.params.studentId;
+
+  const records = await Attendance.find({
+    "students.studentId": studentId
+  });
+
+  let totalClasses = records.length;
+  let attended = 0;
+
+  const history = [];
+
+  records.forEach(r => {
+    const found = r.students.find(s => s.studentId === studentId);
+
+    if(found){
+      attended++;
+      history.push({
+        date: r.date,
+        time: found.time,
+        section: r.section,
+        teacherId: r.teacherId
+      });
+    }
+  });
+
+  const percentage = totalClasses === 0 ? 0 :
+    Math.round((attended / totalClasses) * 100);
+
+  res.json({
+    percentage,
+    totalClasses,
+    attended,
+    history
+  });
 });
