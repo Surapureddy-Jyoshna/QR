@@ -88,10 +88,9 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
         return;
     }
 
-    document.getElementById("msg").innerHTML = "⏳ Getting location...";
+    document.getElementById("msg").innerHTML = "⚡ Marking attendance...";
 
-    // ✅ USE BEST LOCATION
-    getBestLocation(async (pos) => {
+   getLocationFast(async (pos) => {
 
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
