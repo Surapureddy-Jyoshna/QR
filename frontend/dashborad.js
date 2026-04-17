@@ -146,11 +146,10 @@ async function startSessionWithLocation(lat, lng){
   startLiveCount();
 }
 let liveInterval;
-
 function startLiveCount(){
 
     clearInterval(liveInterval);
-    document.getElementById("todaysAttendance").innerText = data.count;
+
     liveInterval = setInterval(async ()=>{
 
         if(!window.currentSessionId) return;
@@ -162,7 +161,8 @@ function startLiveCount(){
 
             const data = await res.json();
 
-            
+            // ✅ update UI here
+            document.getElementById("todaysAttendance").innerText = data.count;
 
         }catch(err){
             console.error("Live count error",err);
@@ -172,6 +172,7 @@ function startLiveCount(){
 
     loadAttendanceList();
 }
+
 function startTimer(){
 
     const token = localStorage.getItem("token");

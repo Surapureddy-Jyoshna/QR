@@ -366,7 +366,7 @@ app.get("/teacher/students/:section", authenticateToken, async (req, res) => {
   fs.createReadStream(__dirname + "/CSE.csv")
     .pipe(csv())
     .on("data", (data) => {
-        if(data.Section === section){
+        if(data.Section?.trim() === section){
           students.push({
             Student_ID: data["Student_ID"]?.trim(),
             Name: data["Name"]?.trim(),
