@@ -103,15 +103,26 @@
 .then(res => res.json())
 .then(data => {
 
-    document.getElementById("attendance").innerText = data.percentage;
-
     const div = document.getElementById("history");
-    div.innerHTML = "<h3>Attendance History</h3>";
+    div.innerHTML = "<h3>Attendance by Teacher</h3>";
 
-    data.history.forEach(r=>{
-        const p = document.createElement("p");
-        p.innerText = `📅 ${r.date} | ⏰ ${r.time} | Sec ${r.section}`;
-        div.appendChild(p);
+    data.forEach(t => {
+
+        const box = document.createElement("div");
+        box.style.marginBottom = "15px";
+
+        box.innerHTML = `
+            <b>Teacher:</b> ${t.teacherId}<br>
+            <b>Attendance:</b> ${t.percentage}%<br>
+        `;
+
+        t.history.forEach(r=>{
+            const p = document.createElement("p");
+            p.innerText = `📅 ${r.date} | ⏰ ${r.time} | Sec ${r.section}`;
+            box.appendChild(p);
+        });
+
+        div.appendChild(box);
     });
 
 });

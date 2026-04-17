@@ -545,11 +545,7 @@ if (alreadyFromDevice) {
 
  
 
-  res.json({
-    success: true,
-    time: currentTime
-  });
-  global.attendanceRecords.push({
+ global.attendanceRecords.push({
   sessionId,
   studentId,
   name,
@@ -557,14 +553,27 @@ if (alreadyFromDevice) {
   deviceId
 });
 
+res.json({
+  success: true,
+  time: currentTime
 });
-app.get("/teacher/live-count/:sessionId", (req, res) => {
 
-  const sessionId = req.params.sessionId;
+});
+app.get("/teacher/live-count/:sessionId", async (req, res) => {
 
-  const count = global.attendanceRecords.filter(
-    r => r.sessionId === sessionId
-  ).length;
+  const session = await Session.findOne({
+    sessionId: req.params.sessionId
+  });
+
+  if (!session) return res.json({ count: 0 });
+
+  const record = await Attendance.findOne({
+    teacherId: session.teacherId,
+    section: session.section,
+    date: session.date
+  });
+
+  const count = record ? record.students.length : 0;
 
   res.json({ count });
 });
@@ -674,32 +683,43 @@ app.get("/student/attendance/:studentId", async (req, res) => {
     "students.studentId": studentId
   });
 
-  let totalClasses = records.length;
-  let attended = 0;
-
-  const history = [];
+  const teacherMap = {};
 
   records.forEach(r => {
+
+    if (!teacherMap[r.teacherId]) {
+      teacherMap[r.teacherId] = {
+        teacherId: r.teacherId,
+        totalClasses: 0,
+        attended: 0,
+        history: []
+      };
+    }
+
+    teacherMap[r.teacherId].totalClasses++;
+
     const found = r.students.find(s => s.studentId === studentId);
 
-    if(found){
-      attended++;
-      history.push({
+    if (found) {
+      teacherMap[r.teacherId].attended++;
+
+      teacherMap[r.teacherId].history.push({
         date: r.date,
         time: found.time,
-        section: r.section,
-        teacherId: r.teacherId
+        section: r.section
       });
     }
   });
 
-  const percentage = totalClasses === 0 ? 0 :
-    Math.round((attended / totalClasses) * 100);
+  // calculate percentage per teacher
+  const result = Object.values(teacherMap).map(t => ({
+    teacherId: t.teacherId,
+    percentage: t.totalClasses === 0 ? 0 :
+      Math.round((t.attended / t.totalClasses) * 100),
+    totalClasses: t.totalClasses,
+    attended: t.attended,
+    history: t.history
+  }));
 
-  res.json({
-    percentage,
-    totalClasses,
-    attended,
-    history
-  });
+  res.json(result);
 });
