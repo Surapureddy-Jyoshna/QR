@@ -456,8 +456,8 @@ if(
   console.log("Distance:", distance);
   console.log("Accuracy:", accuracy);
 
-// ✅ FINAL RELAXED CONDITION
-  const allowedRange = Math.max(accuracy || 0, 150) + 100;
+const baseRange = 100; // your requirement
+const allowedRange = baseRange + (accuracy || 0);
 
   if(distance > allowedRange){
     return res.json({
@@ -679,32 +679,42 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
   const studentId = req.params.studentId;
 
-  const records = await Attendance.find({
-    "students.studentId": studentId
-  });
+  const allClasses = await Class.find();  // all classes
+
+const attendanceRecords = await Attendance.find({
+  "students.studentId": studentId
+});
 
   const teacherMap = {};
 
-  for (const r of records) {
+for (const cls of allClasses) {
 
-    const teacher = await Teacher.findById(r.teacherId);
+  const teacher = await Teacher.findById(cls.teacherId);
 
-    if (!teacherMap[r.teacherId]) {
-      teacherMap[r.teacherId] = {
-        teacherName: teacher ? teacher.name : "Unknown",
-        totalClasses: 0,
-        attended: 0
-      };
-    }
+  if (!teacherMap[cls.teacherId]) {
+    teacherMap[cls.teacherId] = {
+      teacherName: teacher ? teacher.name : "Unknown",
+      totalClasses: 0,
+      attended: 0
+    };
+  }
 
-    teacherMap[r.teacherId].totalClasses++;
+  teacherMap[cls.teacherId].totalClasses++;
 
-    const found = r.students.find(s => s.studentId === studentId);
+  const record = attendanceRecords.find(
+    r => r.teacherId === cls.teacherId && r.date === cls.date
+  );
+
+  if (record) {
+    const found = record.students.find(
+      s => s.studentId === studentId
+    );
 
     if (found) {
-      teacherMap[r.teacherId].attended++;
+      teacherMap[cls.teacherId].attended++;
     }
   }
+}
 
   const teachers = Object.values(teacherMap).map(t => ({
     teacherName: t.teacherName,
