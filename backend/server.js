@@ -461,14 +461,13 @@ const baseRange = 100;
 // real-world stable logic
 const safeAccuracy = accuracy || 0;
 
-const allowedRange = Math.max(300, safeAccuracy + 150);
+const allowedRange = 1000; // 1 km
 
   console.log("Distance:", distance);
 console.log("Accuracy:", accuracy);
 
 if(distance > allowedRange){
 
-  // allow BIG fluctuation (real-world fix)
   if(distance < allowedRange + 150){
     console.log("Allowed due to GPS fluctuation");
   }else{
