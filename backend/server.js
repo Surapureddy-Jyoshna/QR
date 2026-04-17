@@ -92,6 +92,16 @@ const sessionSchema = new mongoose.Schema({
 });
 
 const Session = mongoose.model("Session", sessionSchema);
+let cachedStudents = [];
+
+fs.createReadStream(__dirname + "/CSE.csv")
+  .pipe(csv())
+  .on("data", (data) => {
+    cachedStudents.push(data);
+  })
+  .on("end", () => {
+    console.log("✅ CSV Loaded in Memory");
+  });
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000; // meters
 
@@ -314,50 +324,49 @@ app.get("/teacher/my-classes/:section", authenticateToken, async (req, res) => {
 app.get("/teacher/section-data/:section", authenticateToken, async (req, res) => {
 
   const section = req.params.section;
-  const results = [];
 
-  fs.createReadStream(__dirname + "/CSE.csv")
+  // ✅ FAST (no CSV read again)
+  const results = cachedStudents.filter(data => {
 
-    .pipe(csv())
-    .on("data", (data) => {
-        const csvSection = (data.Section || "").trim();
-const selectedSection = section.trim();
+    const csvSection = (
+      data.Section ||
+      data.section ||
+      data["Section "] ||
+      ""
+    ).trim().toUpperCase();
 
-if(csvSection === selectedSection){
-    results.push(data);
-}
-    })
-    .on("end", async () => {
+    const selectedSection = section.trim().toUpperCase();
 
-        const totalStudents = results.length;
+    return csvSection === selectedSection;
+  });
 
-       
+  const totalStudents = results.length;
 
-
-            const totalClasses = await Class.countDocuments({
+  const totalClasses = await Class.countDocuments({
     teacherId: mongoose.Types.ObjectId(req.user.id),
     section: section
-});
-           const today = new Date().toLocaleDateString("en-CA", {
-  timeZone: "Asia/Kolkata"
-});
+  });
 
-            const attendanceRecord = await Attendance.findOne({
-    teacherId: req.user.id.toString(),
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Kolkata"
+  });
+
+  const attendanceRecord = await Attendance.findOne({
+    teacherId: String(req.user.id),   // ✅ FIXED
     section: section,
     date: today
-});
+  });
 
-const todaysAttendance = attendanceRecord
-  ? attendanceRecord.students.length
-  : 0;
+  const todaysAttendance = attendanceRecord
+    ? attendanceRecord.students.length
+    : 0;
 
-        res.json({
-            totalStudents,
-            totalClasses,
-            todaysAttendance
-        });
-    });
+  res.json({
+    totalStudents,
+    totalClasses,
+    todaysAttendance
+  });
+
 });
 
 // Get Students by Section
