@@ -684,55 +684,52 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
   const studentId = req.params.studentId;
 
+  // ✅ get all attendance records where student present
   const attendanceRecords = await Attendance.find({
-  "students.studentId": studentId
-});
+    "students.studentId": studentId
+  });
 
-const teacherIds = [...new Set(attendanceRecords.map(r => r.teacherId))];
-
-const allClasses = await Class.find({
-  teacherId: { $in: teacherIds.map(id => new mongoose.Types.ObjectId(id)) }
-});
-
+  // ✅ get all classes
+  const classes = await Class.find();
 
   const teacherMap = {};
 
-for (const cls of allClasses) {
+  for (const cls of classes) {
 
-  const teacher = await Teacher.findById(cls.teacherId);
+    const teacherId = String(cls.teacherId);
 
-  if (!teacherMap[cls.teacherId]) {
-    teacherMap[cls.teacherId] = {
-      teacherName: teacher ? teacher.name : "Unknown",
-      totalClasses: 0,
-      attended: 0
-    };
-  }
+    // get teacher name
+    const teacher = await Teacher.findById(cls.teacherId);
 
-  teacherMap[cls.teacherId].totalClasses++;
+    if (!teacherMap[teacherId]) {
+      teacherMap[teacherId] = {
+        teacherName: teacher ? teacher.name : "Unknown",
+        totalClasses: 0,
+        attended: 0
+      };
+    }
 
- const record = attendanceRecords.find(
-  r =>
-    r.teacherId === String(cls.teacherId) &&
-    r.date === cls.date &&
-    r.section === cls.section
-);
+    teacherMap[teacherId].totalClasses++;
 
-  if (record) {
-    const found = record.students.find(
-      s => s.studentId === studentId
+    // check if student attended THIS class
+    const record = attendanceRecords.find(
+      r =>
+        r.teacherId === teacherId &&
+        r.date === cls.date &&
+        r.section === cls.section
     );
 
-    if (found) {
-      teacherMap[cls.teacherId].attended++;
+    if (record) {
+      teacherMap[teacherId].attended++;
     }
   }
-}
 
   const teachers = Object.values(teacherMap).map(t => ({
     teacherName: t.teacherName,
-    percentage: t.totalClasses === 0 ? 0 :
-      Math.round((t.attended / t.totalClasses) * 100),
+    percentage:
+      t.totalClasses === 0
+        ? 0
+        : Math.round((t.attended / t.totalClasses) * 100),
     totalClasses: t.totalClasses,
     attended: t.attended
   }));
@@ -746,11 +743,8 @@ for (const cls of allClasses) {
     attended += t.attended;
   });
 
-  const overall = total === 0 ? 0 :
-    Math.round((attended / total) * 100);
+  const overall =
+    total === 0 ? 0 : Math.round((attended / total) * 100);
 
-  res.json({
-    overall,
-    teachers
-  });
+  res.json({ overall, teachers });
 });
