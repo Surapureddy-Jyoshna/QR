@@ -461,21 +461,20 @@ const baseRange = 100;
 // real-world stable logic
 const safeAccuracy = accuracy || 0;
 
-const allowedRange = Math.max(120, safeAccuracy + 70);
+const allowedRange = Math.max(300, safeAccuracy + 150);
 
   console.log("Distance:", distance);
 console.log("Accuracy:", accuracy);
 
-// ✅ FINAL SAFE LOGIC
 if(distance > allowedRange){
 
-  // allow small fluctuation (IMPORTANT)
-  if(distance < allowedRange + 30){
-    console.log("Allowed due to small fluctuation");
+  // allow BIG fluctuation (real-world fix)
+  if(distance < allowedRange + 150){
+    console.log("Allowed due to GPS fluctuation");
   }else{
     return res.json({
       success: false,
-      message: `You are ${Math.round(distance)} meters away`
+      message: `Too far (${Math.round(distance)}m)`
     });
   }
 }

@@ -54,7 +54,7 @@ function getBestLocation(callback){
                     best = pos;
                 }
 
-                if(tries < 3){
+                if(tries < 5){
                     setTimeout(getLoc, 1000);
                 }else{
                     callback(best);
