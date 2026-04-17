@@ -320,9 +320,12 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 
     .pipe(csv())
     .on("data", (data) => {
-        if(data.Section === section){
-            results.push(data);
-        }
+        const csvSection = (data.Section || "").trim();
+const selectedSection = section.trim();
+
+if(csvSection === selectedSection){
+    results.push(data);
+}
     })
     .on("end", async () => {
 
