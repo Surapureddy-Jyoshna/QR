@@ -96,7 +96,7 @@ async function startAttendance(){
     alert("Location access required!");
   },
   {
-    enableHighAccuracy: true,
+    enableHighAccuracy: false,
     timeout: 20000,
     maximumAge: 0
   }
