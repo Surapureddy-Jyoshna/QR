@@ -150,7 +150,7 @@ let liveInterval;
 function startLiveCount(){
 
     clearInterval(liveInterval);
-
+    document.getElementById("todaysAttendance").innerText = data.count;
     liveInterval = setInterval(async ()=>{
 
         if(!window.currentSessionId) return;

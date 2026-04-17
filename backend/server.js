@@ -332,15 +332,15 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 
 
             const totalClasses = await Class.countDocuments({
-              teacherId: req.user.id,
-              section: section
-          });
+    teacherId: mongoose.Types.ObjectId(req.user.id),
+    section: section
+});
            const today = new Date().toLocaleDateString("en-CA", {
   timeZone: "Asia/Kolkata"
 });
 
             const attendanceRecord = await Attendance.findOne({
-    teacherId: String(req.user.id),
+    teacherId: req.user.id.toString(),
     section: section,
     date: today
 });
