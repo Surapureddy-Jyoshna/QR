@@ -685,14 +685,15 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
   const teacherMap = {};
 
-  records.forEach(r => {
+  for (const r of records) {
+
+    const teacher = await Teacher.findById(r.teacherId);
 
     if (!teacherMap[r.teacherId]) {
       teacherMap[r.teacherId] = {
-        teacherId: r.teacherId,
+        teacherName: teacher ? teacher.name : "Unknown",
         totalClasses: 0,
-        attended: 0,
-        history: []
+        attended: 0
       };
     }
 
@@ -702,24 +703,31 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
     if (found) {
       teacherMap[r.teacherId].attended++;
-
-      teacherMap[r.teacherId].history.push({
-        date: r.date,
-        time: found.time,
-        section: r.section
-      });
     }
-  });
+  }
 
-  // calculate percentage per teacher
-  const result = Object.values(teacherMap).map(t => ({
-    teacherId: t.teacherId,
+  const teachers = Object.values(teacherMap).map(t => ({
+    teacherName: t.teacherName,
     percentage: t.totalClasses === 0 ? 0 :
       Math.round((t.attended / t.totalClasses) * 100),
     totalClasses: t.totalClasses,
-    attended: t.attended,
-    history: t.history
+    attended: t.attended
   }));
 
-  res.json(result);
+  // ✅ overall attendance
+  let total = 0;
+  let attended = 0;
+
+  teachers.forEach(t => {
+    total += t.totalClasses;
+    attended += t.attended;
+  });
+
+  const overall = total === 0 ? 0 :
+    Math.round((attended / total) * 100);
+
+  res.json({
+    overall,
+    teachers
+  });
 });
