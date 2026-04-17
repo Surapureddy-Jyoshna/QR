@@ -340,10 +340,10 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 });
 
             const attendanceRecord = await Attendance.findOne({
-                teacherId: req.user.id,   // ✅ ADD THIS
-                section: section,
-                date: today
-            });
+    teacherId: String(req.user.id),
+    section: section,
+    date: today
+});
 
 const todaysAttendance = attendanceRecord
   ? attendanceRecord.students.length
@@ -458,10 +458,11 @@ if(
 
 const baseRange = 100;
 
-// limit GPS error (VERY IMPORTANT)
-const safeAccuracy = Math.min(accuracy || 0, 50);
+// real-world stable logic
+const safeAccuracy = accuracy || 0;
 
-const allowedRange = baseRange + safeAccuracy;
+// minimum tolerance (IMPORTANT)
+const allowedRange = Math.max(100, safeAccuracy + 80);
 
   if(distance > allowedRange){
     return res.json({
@@ -687,12 +688,11 @@ app.get("/student/attendance/:studentId", async (req, res) => {
   "students.studentId": studentId
 });
 
-const teacherIds = attendanceRecords.map(r => r.teacherId);
+const teacherIds = [...new Set(attendanceRecords.map(r => r.teacherId))];
 
 const allClasses = await Class.find({
-  teacherId: { $in: teacherIds }
+  teacherId: { $in: teacherIds.map(id => new mongoose.Types.ObjectId(id)) }
 });
-
 
 
   const teacherMap = {};

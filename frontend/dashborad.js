@@ -14,6 +14,11 @@ function hideAllSections(){
 window.onload = async function(){
 
     const token = localStorage.getItem("token");
+    if (!token) {
+    alert("Login expired. Please login again.");
+    window.location.href = "teacher_login.html";
+    return;
+}
 
     if (!token){
         window.location.href = "teacher_login.html";
@@ -22,10 +27,15 @@ window.onload = async function(){
 
     try{
 
-        // ===== LOAD PROFILE =====
         const response = await fetch(`${BASE_URL}/teacher/profile`,{
-            headers:{ Authorization:"Bearer "+token }
-        });
+    headers:{ Authorization:"Bearer "+token }
+});
+
+if (!response.ok) {
+    console.error("Profile API failed");
+    alert("Backend not working or token invalid");
+    return;
+}
 
         const data = await response.json();
 
@@ -76,19 +86,21 @@ async function startAttendance(){
   }
 
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const teacherLat = pos.coords.latitude;
-      const teacherLng = pos.coords.longitude;
+  (pos) => {
+    const teacherLat = pos.coords.latitude;
+    const teacherLng = pos.coords.longitude;
 
-      startSessionWithLocation(teacherLat, teacherLng);
-      enableHighAccuracy: true,
-  timeout: 20000,
-  maximumAge: 0
-    },
-    (err) => {
-      alert("Location access required!");
-    }
-  );
+    startSessionWithLocation(teacherLat, teacherLng);
+  },
+  (err) => {
+    alert("Location access required!");
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 20000,
+    maximumAge: 0
+  }
+);
 }
 async function startSessionWithLocation(lat, lng){
 
