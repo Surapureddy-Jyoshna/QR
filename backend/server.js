@@ -457,7 +457,7 @@ if(
   console.log("Accuracy:", accuracy);
 
 // ✅ FINAL RELAXED CONDITION
-  const allowedRange = Math.max(accuracy || 0, 100) + 50;
+  const allowedRange = Math.max(accuracy || 0, 150) + 100;
 
   if(distance > allowedRange){
     return res.json({
