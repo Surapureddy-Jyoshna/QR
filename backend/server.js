@@ -92,52 +92,6 @@ const sessionSchema = new mongoose.Schema({
 });
 
 const Session = mongoose.model("Session", sessionSchema);
-const studentListSchema = new mongoose.Schema({
-  studentId: String,
-  name: String,
-  section: String,
-  rollNo: String
-});
-
-const StudentList = mongoose.model("StudentList", studentListSchema);
-app.get("/import-students", async (req, res) => {
-
-  const students = [];
-
-  fs.createReadStream(__dirname + "/CSE.csv")
-    .pipe(csv())
-    .on("data", (data) => {
-
-      const sectionKey = Object.keys(data).find(
-        k => k.trim().toLowerCase() === "section"
-      );
-
-      students.push({
-        studentId: data["Student_ID"]?.trim(),
-        name: data["Name"]?.trim(),
-        section: data[sectionKey]?.trim().toUpperCase(),
-        rollNo: data["RollNo"]?.trim()
-      });
-    })
-    .on("end", async () => {
-
-      await StudentList.deleteMany(); // clear old
-      await StudentList.insertMany(students);
-
-      res.json({ message: "Students Imported", count: students.length });
-    });
-
-});
-let cachedStudents = [];
-
-fs.createReadStream(__dirname + "/CSE.csv")
-  .pipe(csv())
-  .on("data", (data) => {
-    cachedStudents.push(data);
-  })
-  .on("end", () => {
-    console.log("✅ CSV Loaded in Memory");
-  });
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000; // meters
 
@@ -360,66 +314,74 @@ app.get("/teacher/my-classes/:section", authenticateToken, async (req, res) => {
 app.get("/teacher/section-data/:section", authenticateToken, async (req, res) => {
 
   const section = req.params.section;
+  const results = [];
 
-  const totalStudents = await StudentList.countDocuments({
-  section: section
+  fs.createReadStream(__dirname + "/CSE.csv")
+
+    .pipe(csv())
+    .on("data", (data) => {
+        if(data.Section === section){
+            results.push(data);
+        }
+    })
+    .on("end", async () => {
+
+        const totalStudents = results.length;
+
+       
+
+
+            const totalClasses = await Class.countDocuments({
+              teacherId: req.user.id,
+              section: section
+          });
+           const today = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Asia/Kolkata"
 });
 
-
-  const totalClasses = await Class.countDocuments({
-    teacherId: mongoose.Types.ObjectId(req.user.id),
-    section: section
-  });
-
-  const today = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Kolkata"
-  });
-
-  const attendanceRecord = await Attendance.findOne({
-    teacherId: String(req.user.id),   // ✅ FIXED
+            const attendanceRecord = await Attendance.findOne({
+    teacherId: String(req.user.id),
     section: section,
     date: today
-  });
-
-  const todaysAttendance = attendanceRecord
-    ? attendanceRecord.students.length
-    : 0;
-
-  res.json({
-    totalStudents,
-    totalClasses,
-    todaysAttendance
-  });
-
 });
 
+const todaysAttendance = attendanceRecord
+  ? attendanceRecord.students.length
+  : 0;
+
+        res.json({
+            totalStudents,
+            totalClasses,
+            todaysAttendance
+        });
+    });
+});
+
+// Get Students by Section
 app.get("/teacher/students/:section", authenticateToken, async (req, res) => {
 
-  try {
+  const section = req.params.section;
+  const students = [];
 
-    const section = req.params.section.trim().toUpperCase();
-
-    // ✅ Fetch from DB (NOT CSV)
-    const students = await StudentList.find({
-      section: section
+  fs.createReadStream(__dirname + "/CSE.csv")
+    .pipe(csv())
+    .on("data", (data) => {
+        if(data.Section === section){
+          students.push({
+            Student_ID: data["Student_ID"]?.trim(),
+            Name: data["Name"]?.trim(),
+            Section: data["Section"]?.trim(),
+            RollNo: data["RollNo"]?.trim()
+        });
+        
+        }
+    })
+    .on("end", () => {
+        res.json(students);
     });
 
-    // ✅ Format response (match your frontend structure)
-    const formatted = students.map(s => ({
-      Student_ID: s.studentId,
-      Name: s.name,
-      Section: s.section,
-      RollNo: s.rollNo
-    }));
-
-    res.json(formatted);
-
-  } catch (error) {
-    console.error("❌ Error fetching students:", error);
-    res.status(500).json({ message: "Server Error" });
-  }
-
 });
+
 app.post("/teacher/start-session", authenticateToken, async (req, res) => {
 
   const sessionId = "SESSION_" + Date.now();
