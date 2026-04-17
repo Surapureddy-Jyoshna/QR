@@ -6,34 +6,74 @@
 </head>
 <body>
 
-    <div class="container">
-      <div class="card">
-    
-        <h2>Attendance Verification</h2>
-    
-        <form id="attendanceForm">
-          <input type="text" id="studentName" placeholder="Enter Name" required>
-          <input type="text" id="studentId" placeholder="Enter ID" required>
-          <button type="submit">Mark Attendance</button>
-        </form>
-    
-        <p id="msg"></p>
-    
-      </div>
-    </div>
-</body>    
+<div class="container">
+  <div class="card">
+
+    <h2>Attendance Verification</h2>
+
+    <form id="attendanceForm">
+      <input type="text" id="studentName" placeholder="Enter Name" required>
+      <input type="text" id="studentId" placeholder="Enter ID" required>
+      <button type="submit">Mark Attendance</button>
+    </form>
+
+    <p id="msg"></p>
+
+  </div>
+</div>
 
 <script>
 const params = new URLSearchParams(window.location.search);
 const sessionId = params.get("session");
+
 let deviceId = localStorage.getItem("deviceId");
 
 if(!deviceId){
     deviceId = "DEVICE_" + Math.random().toString(36).substring(2);
     localStorage.setItem("deviceId", deviceId);
 }
+
 if(!sessionId){
     document.body.innerHTML="<h2>Invalid QR</h2>";
+}
+
+// ✅ BEST LOCATION FUNCTION (FIXED)
+function getBestLocation(callback){
+
+    let best = null;
+    let tries = 0;
+
+    function getLoc(){
+        navigator.geolocation.getCurrentPosition(
+            (pos)=>{
+
+                tries++;
+
+                // pick best accuracy
+                if(!best || pos.coords.accuracy < best.coords.accuracy){
+                    best = pos;
+                }
+
+                if(tries < 3){
+                    setTimeout(getLoc, 1000);
+                }else{
+                    callback(best);
+                }
+
+            },
+            ()=>{
+                document.getElementById("msg").innerHTML =
+                `<span style="color:red;">❌ Location permission denied</span>`;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    getLoc();
 }
 
 document.getElementById("attendanceForm").onsubmit = async (e)=>{
@@ -50,68 +90,55 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
 
     document.getElementById("msg").innerHTML = "⏳ Getting location...";
 
-    navigator.geolocation.getCurrentPosition(
-async (pos) => {
+    // ✅ USE BEST LOCATION
+    getBestLocation(async (pos) => {
 
-    const lat = pos.coords.latitude;
-const lng = pos.coords.longitude;
-const accuracy = pos.coords.accuracy;
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
 
-console.log("Student Accuracy:", accuracy);
+        console.log("BEST Accuracy:", accuracy);
 
-    try {
+        try {
 
-        const BASE_URL = "https://qr-1-jep5.onrender.com";
+            const BASE_URL = "https://qr-1-jep5.onrender.com";
 
-const res = await fetch(`${BASE_URL}/student/mark-attendance`,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-    sessionId,
-    studentId,
-    name,
-    deviceId,
-    lat,
-    lng,
-    accuracy   // ✅ ADD THIS
-})
-        });
+            const res = await fetch(`${BASE_URL}/student/mark-attendance`,{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    sessionId,
+                    studentId,
+                    name,
+                    deviceId,
+                    lat,
+                    lng,
+                    accuracy
+                })
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        console.log("Response:", data);
+            if(data.success){
+                document.getElementById("msg").innerHTML =
+                `<span style="color:green;">✅ Marked at ${data.time}</span>`;
+            }else{
+                document.getElementById("msg").innerHTML =
+                `<span style="color:red;">❌ ${data.message}</span>`;
+            }
 
-        if(data.success){
+        } catch(err){
+            console.error(err);
             document.getElementById("msg").innerHTML =
-            `<span style="color:green;">✅ Marked at ${data.time}</span>`;
-        }else{
-            document.getElementById("msg").innerHTML =
-            `<span style="color:red;">❌ ${data.message}</span>`;
+            `<span style="color:red;">❌ Server error</span>`;
         }
 
-    } catch(err){
+    });
 
-        console.error("FETCH ERROR:", err);
-
-        document.getElementById("msg").innerHTML =
-        `<span style="color:red;">❌ Server not reachable</span>`;
-    }
-
-},
-(err) => {
-    document.getElementById("msg").innerHTML =
-    `<span style="color:red;">❌ Location permission denied</span>`;
-},
-{
-    enableHighAccuracy: true,
-    timeout: 20000,
-    maximumAge: 0
-}
-);
 };
-
 </script>
 
+</body>
 </html>

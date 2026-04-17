@@ -461,8 +461,7 @@ const baseRange = 100;
 // real-world stable logic
 const safeAccuracy = accuracy || 0;
 
-// minimum tolerance (IMPORTANT)
-const allowedRange = Math.max(100, safeAccuracy + 80);
+const allowedRange = Math.max(120, safeAccuracy + 70);
 
   if(distance > allowedRange){
     return res.json({
