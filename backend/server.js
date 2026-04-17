@@ -325,20 +325,23 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 
   const section = req.params.section;
 
-  // ✅ FAST (no CSV read again)
   const results = cachedStudents.filter(data => {
 
-    const csvSection = (
-      data.Section ||
-      data.section ||
-      data["Section "] ||
-      ""
-    ).trim().toUpperCase();
+  const selectedSection = section.trim().toUpperCase();
 
-    const selectedSection = section.trim().toUpperCase();
+  // ✅ find correct column automatically
+  const sectionKey = Object.keys(data).find(
+    key => key.trim().toLowerCase() === "section"
+  );
 
-    return csvSection === selectedSection;
-  });
+  if (!sectionKey) return false;
+
+  const csvSection = String(data[sectionKey])
+    .trim()
+    .toUpperCase();
+
+  return csvSection === selectedSection;
+});
 
   const totalStudents = results.length;
 
