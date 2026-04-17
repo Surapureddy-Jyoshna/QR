@@ -684,45 +684,55 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
   const studentId = req.params.studentId;
 
-  // ✅ get all attendance records where student present
   const attendanceRecords = await Attendance.find({
-    "students.studentId": studentId
-  });
+  "students.studentId": studentId
+});
 
-  // ✅ get all classes
-  const classes = await Class.find();
+const studentSection = attendanceRecords[0]?.section;
+
+
 
   const teacherMap = {};
 
-  for (const cls of classes) {
+  const classes = await Class.find();
 
-    const teacherId = String(cls.teacherId);
+for (const cls of classes) {
 
-    // get teacher name
-    const teacher = await Teacher.findById(cls.teacherId);
+  const teacherId = String(cls.teacherId);
 
-    if (!teacherMap[teacherId]) {
-      teacherMap[teacherId] = {
-        teacherName: teacher ? teacher.name : "Unknown",
-        totalClasses: 0,
-        attended: 0
-      };
-    }
+  // ✅ ONLY consider student's section
+  const belongsToStudentSection = attendanceRecords.some(
+    r => r.section === cls.section
+  );
 
-    teacherMap[teacherId].totalClasses++;
+  if (!belongsToStudentSection) continue;
 
-    // check if student attended THIS class
-    const record = attendanceRecords.find(
-      r =>
-        r.teacherId === teacherId &&
-        r.date === cls.date &&
-        r.section === cls.section
-    );
+  // get teacher name
+  const teacher = await Teacher.findById(cls.teacherId);
 
-    if (record) {
-      teacherMap[teacherId].attended++;
-    }
+  if (!teacherMap[teacherId]) {
+    teacherMap[teacherId] = {
+      teacherName: teacher ? teacher.name : "Unknown",
+      totalClasses: 0,
+      attended: 0
+    };
   }
+
+  // ✅ count class
+  teacherMap[teacherId].totalClasses++;
+
+  // ✅ check if THIS student attended THIS class
+  const attended = attendanceRecords.some(
+    r =>
+      String(r.teacherId) === teacherId &&
+      r.date === cls.date &&
+      r.section === cls.section
+  );
+
+  if (attended) {
+    teacherMap[teacherId].attended++;
+  }
+}
 
   const teachers = Object.values(teacherMap).map(t => ({
     teacherName: t.teacherName,
