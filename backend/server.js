@@ -435,51 +435,6 @@ app.post("/student/mark-attendance", async (req, res) => {
    });
   }
 
-
-// ✅ Proper condition check (FIXED)
-if(
-  session &&
-  session.lat !== undefined &&
-  session.lng !== undefined &&
-  lat !== undefined &&
-  lng !== undefined
-){
-
-  const distance = getDistance(
-  session.lat,
-  session.lng,
-  lat,
-  lng
-  );
-
-// ✅ LOG FOR DEBUG
-  console.log("Distance:", distance);
-  console.log("Accuracy:", accuracy);
-
-const baseRange = 100;
-
-// real-world stable logic
-const safeAccuracy = accuracy || 0;
-
-const allowedRange = 1000; // 1 km
-
-  console.log("Distance:", distance);
-console.log("Accuracy:", accuracy);
-
-if(distance > allowedRange){
-
-  if(distance < allowedRange + 150){
-    console.log("Allowed due to GPS fluctuation");
-  }else{
-    return res.json({
-      success: false,
-      message: `Too far (${Math.round(distance)}m)`
-    });
-  }
-}
-  }
-
-
   if (!session || !session.active) {
     return res.json({ success: false, message: "Attendance Closed" });
   }
