@@ -61,10 +61,33 @@ function getBestLocation(callback){
                 }
 
             },
-            ()=>{
-                document.getElementById("msg").innerHTML =
-                `<span style="color:red;">❌ Location permission denied</span>`;
-            },
+            async ()=>{
+
+    console.log("⚠️ Using fallback (no GPS)");
+
+    const BASE_URL = "https://qr-1-jep5.onrender.com";
+
+    const res = await fetch(`${BASE_URL}/student/mark-attendance`,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            sessionId,
+            studentId,
+            name,
+            deviceId,
+            lat: 0,
+            lng: 0,
+            accuracy: 999
+        })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("msg").innerHTML =
+    `<span style="color:green;">✅ Marked (no GPS)</span>`;
+},
             {
                 enableHighAccuracy: true,
                 timeout: 10000,
