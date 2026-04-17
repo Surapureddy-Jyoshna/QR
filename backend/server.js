@@ -92,6 +92,42 @@ const sessionSchema = new mongoose.Schema({
 });
 
 const Session = mongoose.model("Session", sessionSchema);
+const studentListSchema = new mongoose.Schema({
+  studentId: String,
+  name: String,
+  section: String,
+  rollNo: String
+});
+
+const StudentList = mongoose.model("StudentList", studentListSchema);
+app.get("/import-students", async (req, res) => {
+
+  const students = [];
+
+  fs.createReadStream(__dirname + "/CSE.csv")
+    .pipe(csv())
+    .on("data", (data) => {
+
+      const sectionKey = Object.keys(data).find(
+        k => k.trim().toLowerCase() === "section"
+      );
+
+      students.push({
+        studentId: data["Student_ID"]?.trim(),
+        name: data["Name"]?.trim(),
+        section: data[sectionKey]?.trim().toUpperCase(),
+        rollNo: data["RollNo"]?.trim()
+      });
+    })
+    .on("end", async () => {
+
+      await StudentList.deleteMany(); // clear old
+      await StudentList.insertMany(students);
+
+      res.json({ message: "Students Imported", count: students.length });
+    });
+
+});
 let cachedStudents = [];
 
 fs.createReadStream(__dirname + "/CSE.csv")
@@ -325,25 +361,10 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 
   const section = req.params.section;
 
-  const results = cachedStudents.filter(data => {
-
-  const selectedSection = section.trim().toUpperCase();
-
-  // ✅ find correct column automatically
-  const sectionKey = Object.keys(data).find(
-    key => key.trim().toLowerCase() === "section"
-  );
-
-  if (!sectionKey) return false;
-
-  const csvSection = String(data[sectionKey])
-    .trim()
-    .toUpperCase();
-
-  return csvSection === selectedSection;
+  const totalStudents = await StudentList.countDocuments({
+  section: section
 });
 
-  const totalStudents = results.length;
 
   const totalClasses = await Class.countDocuments({
     teacherId: mongoose.Types.ObjectId(req.user.id),
@@ -372,31 +393,33 @@ app.get("/teacher/section-data/:section", authenticateToken, async (req, res) =>
 
 });
 
-// Get Students by Section
 app.get("/teacher/students/:section", authenticateToken, async (req, res) => {
 
-  const section = req.params.section;
-  const students = [];
+  try {
 
-  fs.createReadStream(__dirname + "/CSE.csv")
-    .pipe(csv())
-    .on("data", (data) => {
-        if(data.Section?.trim() === section){
-          students.push({
-            Student_ID: data["Student_ID"]?.trim(),
-            Name: data["Name"]?.trim(),
-            Section: data["Section"]?.trim(),
-            RollNo: data["RollNo"]?.trim()
-        });
-        
-        }
-    })
-    .on("end", () => {
-        res.json(students);
+    const section = req.params.section.trim().toUpperCase();
+
+    // ✅ Fetch from DB (NOT CSV)
+    const students = await StudentList.find({
+      section: section
     });
 
-});
+    // ✅ Format response (match your frontend structure)
+    const formatted = students.map(s => ({
+      Student_ID: s.studentId,
+      Name: s.name,
+      Section: s.section,
+      RollNo: s.rollNo
+    }));
 
+    res.json(formatted);
+
+  } catch (error) {
+    console.error("❌ Error fetching students:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+
+});
 app.post("/teacher/start-session", authenticateToken, async (req, res) => {
 
   const sessionId = "SESSION_" + Date.now();
