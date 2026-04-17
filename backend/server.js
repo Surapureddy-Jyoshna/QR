@@ -712,7 +712,10 @@ for (const cls of allClasses) {
   teacherMap[cls.teacherId].totalClasses++;
 
  const record = attendanceRecords.find(
-  r => r.teacherId === String(cls.teacherId)
+  r =>
+    r.teacherId === String(cls.teacherId) &&
+    r.date === cls.date &&
+    r.section === cls.section
 );
 
   if (record) {

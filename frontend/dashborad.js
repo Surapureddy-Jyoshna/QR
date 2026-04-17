@@ -81,6 +81,9 @@ async function startAttendance(){
       const teacherLng = pos.coords.longitude;
 
       startSessionWithLocation(teacherLat, teacherLng);
+      enableHighAccuracy: true,
+  timeout: 20000,
+  maximumAge: 0
     },
     (err) => {
       alert("Location access required!");
