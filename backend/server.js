@@ -463,12 +463,22 @@ const safeAccuracy = accuracy || 0;
 
 const allowedRange = Math.max(120, safeAccuracy + 70);
 
-  if(distance > allowedRange){
+  console.log("Distance:", distance);
+console.log("Accuracy:", accuracy);
+
+// ✅ FINAL SAFE LOGIC
+if(distance > allowedRange){
+
+  // allow small fluctuation (IMPORTANT)
+  if(distance < allowedRange + 30){
+    console.log("Allowed due to small fluctuation");
+  }else{
     return res.json({
       success: false,
       message: `You are ${Math.round(distance)} meters away`
     });
   }
+}
   }
 
 
