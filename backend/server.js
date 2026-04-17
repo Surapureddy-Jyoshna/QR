@@ -482,7 +482,7 @@ if (alreadyFromDevice) {
   );
 
   if (alreadyMarked) {
-    return res.json({ success: false, message: "Already marked" });
+    return res.json({ success: false, message: "Only one scan is allowed..!" });
   }
 
   const currentTime = new Date().toLocaleTimeString("en-IN", {
