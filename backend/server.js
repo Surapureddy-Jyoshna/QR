@@ -456,8 +456,12 @@ if(
   console.log("Distance:", distance);
   console.log("Accuracy:", accuracy);
 
-const baseRange = 100; // your requirement
-const allowedRange = baseRange + (accuracy || 0);
+const baseRange = 100;
+
+// limit GPS error (VERY IMPORTANT)
+const safeAccuracy = Math.min(accuracy || 0, 50);
+
+const allowedRange = baseRange + safeAccuracy;
 
   if(distance > allowedRange){
     return res.json({
@@ -476,11 +480,11 @@ const allowedRange = baseRange + (accuracy || 0);
   const section = session.section;
 
   const alreadyFromDevice = global.attendanceRecords.some(
-  r => r.sessionId === sessionId && r.deviceId === deviceId
+  r => r.sessionId === sessionId && r.studentId === studentId
 );
 
 if (alreadyFromDevice) {
-  return res.json({ success: false, message: "Already marked from this device" });
+  return res.json({ success: false, message: "Already marked" });
 }
 
   let record = await Attendance.findOneAndUpdate(
@@ -679,11 +683,17 @@ app.get("/student/attendance/:studentId", async (req, res) => {
 
   const studentId = req.params.studentId;
 
-  const allClasses = await Class.find();  // all classes
-
-const attendanceRecords = await Attendance.find({
+  const attendanceRecords = await Attendance.find({
   "students.studentId": studentId
 });
+
+const teacherIds = attendanceRecords.map(r => r.teacherId);
+
+const allClasses = await Class.find({
+  teacherId: { $in: teacherIds }
+});
+
+
 
   const teacherMap = {};
 
@@ -701,9 +711,9 @@ for (const cls of allClasses) {
 
   teacherMap[cls.teacherId].totalClasses++;
 
-  const record = attendanceRecords.find(
-    r => r.teacherId === cls.teacherId && r.date === cls.date
-  );
+ const record = attendanceRecords.find(
+  r => r.teacherId === String(cls.teacherId)
+);
 
   if (record) {
     const found = record.students.find(
