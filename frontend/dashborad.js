@@ -70,6 +70,7 @@ if (!response.ok) {
     }
     document.getElementById("dashboardSectionSelect").style.display = "block";
     showDashboard();
+    loadSectionBarChart();
 };
 
 
@@ -465,9 +466,7 @@ async function loadReportBySection(){
 
         tbody.appendChild(tr);
     });
-    document.getElementById("lowSectionSelect").value = section;
-loadLowAttendance();
-renderChart(students);
+    
 }
 
 
@@ -769,11 +768,27 @@ async function loadLowAttendance(){
         container.appendChild(p);
     });
 }
-function renderChart(data){
+async function loadSectionBarChart(){
+
+  const token = localStorage.getItem("token");
+
+  const sections = ["A","B","C","D","E"];
+  const lowCounts = [];
+
+  for(let sec of sections){
+
+    const res = await fetch(`${BASE_URL}/teacher/report/${sec}`,{
+      headers:{ Authorization:"Bearer "+token }
+    });
+
+    const students = await res.json();
+
+    const low = students.filter(s => s.attendance < 75).length;
+
+    lowCounts.push(low);
+  }
 
   const ctx = document.getElementById("attendanceChart");
-
-  if(!ctx) return;
 
   if(chart){
     chart.destroy();
@@ -782,23 +797,24 @@ function renderChart(data){
   chart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: data.map(s => s.name),
+      labels: sections,
       datasets: [{
-        label: "Attendance %",
-        data: data.map(s => s.attendance),
-        backgroundColor: data.map(s => {
-            if(s.attendance < 75) return "#ef4444";   
-            if(s.attendance < 85) return "#f59e0b";   
-            return "#22c55e";                         
-        })
+        label: "Low Attendance Students",
+        data: lowCounts,
+        backgroundColor: "#ef4444"
       }]
     },
     options: {
       responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100
+      plugins:{
+        title:{
+          display:true,
+          text:"Low Attendance per Section"
+        }
+      },
+      scales:{
+        y:{
+          beginAtZero:true
         }
       }
     }
