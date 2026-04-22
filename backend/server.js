@@ -445,7 +445,7 @@ app.post("/student/mark-attendance", async (req, res) => {
   lng
 );
 
-if(distance > 50){ // 50 meters
+if(distance > 120){
   return res.json({
     success:false,
     message:"You are not in classroom!"
@@ -466,9 +466,7 @@ if (alreadyFromDevice) {
   });
 }
 
-if (alreadyFromDevice) {
-  return res.json({ success: false, message: "Already marked" });
-}
+
 
   let record = await Attendance.findOneAndUpdate(
   {

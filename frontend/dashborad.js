@@ -133,8 +133,7 @@ async function startSessionWithLocation(lat, lng){
   qrDiv.innerHTML="";
   qrWrapper.style.display="flex";
 
-  const qrURL = `${window.location.origin}/scan.html?session=${sessionId}`;
-
+ const qrURL = `https://qr-1-jep5.onrender.com/scan.html?session=${sessionId}`;
   new QRCode(qrDiv,{
     text: qrURL,
     width:220,
@@ -787,9 +786,11 @@ function renderChart(data){
       datasets: [{
         label: "Attendance %",
         data: data.map(s => s.attendance),
-        backgroundColor: data.map(s =>
-          s.attendance < 75 ? "#ef4444" : "#22c55e"
-        )
+        backgroundColor: data.map(s => {
+            if(s.attendance < 75) return "#ef4444";   
+            if(s.attendance < 85) return "#f59e0b";   
+            return "#22c55e";                         
+        })
       }]
     },
     options: {

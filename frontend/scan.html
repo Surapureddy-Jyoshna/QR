@@ -29,25 +29,32 @@ const sessionId = params.get("session");
 let deviceId = localStorage.getItem("deviceId");
 
 if(!deviceId){
-    deviceId = "DEVICE_" + Math.random().toString(36).substring(2);
+   deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
 }
 
 if(!sessionId){
     document.body.innerHTML="<h2>Invalid QR</h2>";
 }
-
 function getLocationFast(callback){
+
+    if(!navigator.geolocation){
+        alert("Geolocation not supported");
+        return;
+    }
 
     navigator.geolocation.getCurrentPosition(
         (pos)=>{
             callback(pos);
         },
-        
+        (err)=>{
+            alert("❌ Please allow location permission");
+            console.error(err);
+        },
         {
-            enableHighAccuracy: false,  // 🔥 IMPORTANT (faster)
-            timeout: 5000,
-            maximumAge: 60000
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
         }
     );
 }
@@ -70,6 +77,7 @@ document.getElementById("attendanceForm").onsubmit = async (e)=>{
 
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+        console.log("Location:", lat, lng);
         const accuracy = pos.coords.accuracy;
 
         console.log("BEST Accuracy:", accuracy);
