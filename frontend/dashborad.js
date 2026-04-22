@@ -69,6 +69,7 @@ if (!response.ok) {
         console.error("Dashboard Load Error:",err);
     }
     document.getElementById("dashboardSectionSelect").style.display = "block";
+    showDashboard();
 };
 
 
@@ -469,7 +470,7 @@ async function loadReportBySection(){
 loadLowAttendance();
 renderChart(students);
 }
-let chart;
+
 
 async function loadReports(){
 
@@ -569,10 +570,12 @@ async function loadSectionData(){
 }
 
 
-document.getElementById("myClassSectionSelect")
-.addEventListener("change", function(){
-    showMyClasses();
-});
+const myClassSelect = document.getElementById("myClassSectionSelect");
+if(myClassSelect){
+    myClassSelect.addEventListener("change", function(){
+        showMyClasses();
+    });
+}
 
 
 function showStudents(){
@@ -583,8 +586,9 @@ function showStudents(){
 }
 
 
-document.getElementById("studentSectionSelect")
-.addEventListener("change", async function(){
+const studentSection = document.getElementById("studentSectionSelect");
+if(studentSection){
+    studentSection.addEventListener("change", async function(){
 
     const section = this.value;
 
@@ -632,8 +636,10 @@ document.getElementById("studentSectionSelect")
     });
 
 });
-document.getElementById("studentSearch")
-.addEventListener("input", function(){
+}
+const searchInput = document.getElementById("studentSearch");
+if(searchInput){
+    searchInput.addEventListener("input", function(){
 
     const value = this.value.toLowerCase();
     const cards = document.querySelectorAll(".student-name-card");
@@ -643,6 +649,7 @@ document.getElementById("studentSearch")
         card.style.display = text.includes(value) ? "flex" : "none";
     });
 });
+}
 function openStudentModal(student){
 
     const studentId = student.Student_ID || student["Student_ID"] || student["Student_ID "];
