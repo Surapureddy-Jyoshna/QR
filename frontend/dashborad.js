@@ -429,7 +429,10 @@ async function loadReportBySection(){
 
     const section = document.getElementById("reportSectionSelect").value;
 
-    if(!section) return;
+    if(!section){
+    document.getElementById("reportTable").innerHTML = "";
+    return;
+}
 
     const token = localStorage.getItem("token");
 
