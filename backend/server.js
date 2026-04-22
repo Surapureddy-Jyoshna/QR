@@ -438,13 +438,33 @@ app.post("/student/mark-attendance", async (req, res) => {
   if (!session || !session.active) {
     return res.json({ success: false, message: "Attendance Closed" });
   }
+  const distance = getDistance(
+  session.lat,
+  session.lng,
+  lat,
+  lng
+);
+
+if(distance > 50){ // 50 meters
+  return res.json({
+    success:false,
+    message:"You are not in classroom!"
+  });
+}
 
   const date = session.date;
   const section = session.section;
 
   const alreadyFromDevice = global.attendanceRecords.some(
-  r => r.sessionId === sessionId && r.studentId === studentId
+  r => r.sessionId === sessionId && r.deviceId === deviceId
 );
+
+if (alreadyFromDevice) {
+  return res.json({
+    success: false,
+    message: "This device already marked attendance!"
+  });
+}
 
 if (alreadyFromDevice) {
   return res.json({ success: false, message: "Already marked" });
@@ -476,7 +496,7 @@ if (alreadyFromDevice) {
     });
   }
 
-  // ❌ prevent duplicate student
+  
   const alreadyMarked = record.students.some(
     s => s.studentId === studentId
   );

@@ -866,3 +866,23 @@
 .sidebar.closed .nav-item {
   justify-content: center;
 }
+.report-bottom-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.low-attendance-card {
+  flex: 1;
+}
+
+.chart-card {
+  flex: 2;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .report-bottom-container {
+    flex-direction: column;
+  }
+}

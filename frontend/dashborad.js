@@ -1,5 +1,6 @@
 const BASE_URL = "https://qr-1-jep5.onrender.com";
 let currentSection = "";
+let chart;
 function hideAllSections(){
     document.querySelector(".qr-card").style.display = "none";
     document.querySelector(".stats-grid").style.display = "none";
@@ -47,8 +48,7 @@ if (!response.ok) {
         document.getElementById("profileEmployeeId").innerText =
             data.employeeId;
 
-        // ===== LOAD TOTAL CLASSES =====
-        await loadTotalClasses();
+       
 
         // ===== LOAD THEME =====
         if(localStorage.getItem("theme")==="dark"){
@@ -467,6 +467,7 @@ async function loadReportBySection(){
     });
     document.getElementById("lowSectionSelect").value = section;
 loadLowAttendance();
+renderChart(students);
 }
 let chart;
 
@@ -761,4 +762,37 @@ async function loadLowAttendance(){
         p.innerHTML = `<span>⚠️ ${s.name}</span> <span>${s.attendance}%</span>`;
         container.appendChild(p);
     });
+}
+function renderChart(data){
+
+  const ctx = document.getElementById("attendanceChart");
+
+  if(!ctx) return;
+
+  if(chart){
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.map(s => s.name),
+      datasets: [{
+        label: "Attendance %",
+        data: data.map(s => s.attendance),
+        backgroundColor: data.map(s =>
+          s.attendance < 75 ? "#ef4444" : "#22c55e"
+        )
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100
+        }
+      }
+    }
+  });
 }

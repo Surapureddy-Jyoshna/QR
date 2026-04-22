@@ -221,30 +221,35 @@
 
   </div>
 
- <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; width:100%;">
+ <div class="report-bottom-container">
 
-  <!-- LEFT -->
-  <h3 style="font-size:16px;">⚠️ Low Attendance</h3>
+  <!-- LEFT SIDE -->
+  <div class="card low-attendance-card">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>⚠️ Low Attendance</h3>
 
-  <!-- RIGHT -->
-  <div style="margin-left:auto; display:flex; align-items:center; gap:6px;">
-    <span style="font-size:14px;"><b>Select:</b></span>
-
-    <select id="lowSectionSelect" class="small-select"
-            onchange="loadLowAttendance()">
+      <select id="lowSectionSelect" onchange="loadLowAttendance()">
         <option value="">-- select--</option>
         <option value="A">Section A</option>
         <option value="B">Section B</option>
         <option value="C">Section C</option>
         <option value="D">Section D</option>
         <option value="E">Section E</option>
-    </select>
+      </select>
+    </div>
+
+    <div id="lowAttendanceList"></div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="card chart-card">
+    <h3>📊 Attendance Chart</h3>
+    <canvas id="attendanceChart"></canvas>
   </div>
 
 </div>
-
-<!-- LIST -->
-<div id="lowAttendanceList" class="low-list"></div>
 </div>
 
 <!-- SETTINGS SECTION -->
