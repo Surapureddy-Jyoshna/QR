@@ -17,8 +17,12 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
-app.use(express.static(__dirname + "/frontend"));
+const path = require("path");
 
+app.use(express.static(path.join(__dirname, "../frontend")));
+app.get("/scan.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "scan.html"));
+});
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
   .catch(err => console.log("Mongo Error ❌", err));
@@ -808,17 +812,18 @@ app.get("/student/ml-needed/:studentId", async (req, res) => {
     if(present) attended++;
   });
 
-  const current = total === 0 ? 0 : (attended/total)*100;
+  if(total === 0){
+    return res.json({ current: 0, needed: 0 });
+  }
 
-  const mlRes = await axios.post("http://localhost:5001/predict", {
-    current,
-    total,
-    attended
-  });
+  const current = (attended / total) * 100;
+
+  let needed = Math.ceil((0.75 * total - attended) / 0.25);
+  if(needed < 0) needed = 0;
 
   res.json({
     current: Math.round(current),
-    needed: mlRes.data.needed
+    needed
   });
 
 });
