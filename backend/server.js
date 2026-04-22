@@ -739,3 +739,86 @@ for (const cls of classes) {
 
   res.json({ overall, teachers });
 });
+
+app.get("/student/required-classes/:studentId", async (req, res) => {
+
+  const studentId = req.params.studentId;
+
+  // get attendance records
+  const records = await Attendance.find({
+    "students.studentId": studentId
+  });
+
+  if(records.length === 0){
+    return res.json({ needed: 0, message: "No data available" });
+  }
+
+  let totalClasses = 0;
+  let attended = 0;
+
+  records.forEach(r => {
+    totalClasses++;
+
+    const present = r.students.some(
+      s => s.studentId === studentId
+    );
+
+    if(present) attended++;
+  });
+
+  // target = 75%
+  let needed = 0;
+
+  let futureTotal = totalClasses;
+  let futureAttend = attended;
+
+  while(true){
+    const percent = (futureAttend / futureTotal) * 100;
+
+    if(percent >= 75) break;
+
+    futureTotal++;
+    futureAttend++;
+    needed++;
+  }
+
+  res.json({
+    current: Math.round((attended/totalClasses)*100),
+    needed
+  });
+
+});
+const axios = require("axios");
+
+app.get("/student/ml-needed/:studentId", async (req, res) => {
+
+  const studentId = req.params.studentId;
+
+  const records = await Attendance.find({
+    "students.studentId": studentId
+  });
+
+  let total = records.length;
+  let attended = 0;
+
+  records.forEach(r => {
+    const present = r.students.some(
+      s => s.studentId === studentId
+    );
+    if(present) attended++;
+  });
+
+  const current = total === 0 ? 0 : (attended/total)*100;
+
+  const mlRes = await axios.post("http://localhost:5001/predict", {
+    current,
+    total,
+    attended
+  });
+
+  res.json({
+    current: Math.round(current),
+    needed: mlRes.data.needed
+  });
+
+});

@@ -164,6 +164,11 @@ body{
             <span id="attendance">0%</span>
         </div>
     </div>
+    <div class="card">
+  <h3>🤖 ML Attendance Predictor</h3>
+  <button onclick="predictML()">Check Needed Classes</button>
+  <p id="mlResult"></p>
+</div>
 
     <!-- TEACHERS -->
     <div class="card">
@@ -228,6 +233,21 @@ document.getElementById("studentLogout")
     window.location.href = "index.html";
 });
 </script>
+<script>
+    function predictML(){
 
+  const id = localStorage.getItem("studentId");
+
+  fetch(`https://qr-1-jep5.onrender.com/student/ml-needed/${id}`)
+  .then(res => res.json())
+  .then(data => {
+
+    document.getElementById("mlResult").innerHTML =
+      `Current: ${data.current}% <br>
+       Need ${data.needed} classes to reach safe zone`;
+
+  });
+}
+</script>
 </body>
 </html>
