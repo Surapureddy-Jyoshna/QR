@@ -135,7 +135,7 @@ body{
 .avg{ color:orange; }
 .good{ color:green; }
 .modal{
-  display:none;
+  display:none;             /* hidden initially */
   position:fixed;
   top:0;
   left:0;
@@ -143,8 +143,10 @@ body{
   height:100%;
   background:rgba(0,0,0,0.5);
   z-index:1000;
-}
 
+  justify-content:center;
+  align-items:center;
+}
 .modal-content{
   background:white;
   padding:25px;
@@ -154,20 +156,6 @@ body{
   text-align:center;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
-.modal{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  z-index:1000;
-
-  display:flex;              /* 🔥 IMPORTANT */
-  justify-content:center;    /* center horizontally */
-  align-items:center;        /* center vertically */
-}
 
 .ml-modal-box{
   background:white;
@@ -176,6 +164,62 @@ body{
   border-radius:16px;
   text-align:center;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+/* INPUT STYLE */
+.input-group input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:12px;
+  transition:0.3s;
+}
+
+.input-group input:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 6px rgba(37,99,235,0.3);
+  outline:none;
+}
+
+/* PREDICT BUTTON */
+.predict-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(90deg,#2563eb,#7c3aed);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.predict-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* CLOSE BUTTON */
+.close-btn{
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#e5e7eb;
+  cursor:pointer;
+}
+
+.close-btn:hover{
+  background:#d1d5db;
+}
+
+/* RESULT BOX */
+.ml-result-box{
+  margin-top:12px;
+  padding:10px;
+  border-radius:10px;
+  background:#f1f5f9;
+  font-weight:500;
 }
 </style>
 </head>
@@ -250,6 +294,12 @@ body{
 </div>
 
 <script>
+    window.onclick = function(e){
+  const modal = document.getElementById("mlModal");
+  if(e.target === modal){
+    closeMLModal();
+  }
+}
 const studentId = localStorage.getItem("studentId");
 
 // PROFILE
@@ -311,6 +361,11 @@ document.getElementById("studentLogout")
 
 function closeMLModal(){
   document.getElementById("mlModal").style.display = "none";
+
+  // clear inputs
+  document.getElementById("totalInput").value = "";
+  document.getElementById("percentInput").value = "";
+  document.getElementById("mlOutput").innerHTML = "";
 }
 
 function calculatePrediction(){
