@@ -23,32 +23,34 @@ body{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    box-shadow:0 4px 15px rgba(0,0,0,0.1);
-}
-
-.header h2{
-    font-weight:600;
-}
-
-.logout-btn{
-    background:#ef4444;
-    border:none;
-    padding:10px 16px;
-    color:white;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-.logout-btn:hover{
-    background:#dc2626;
 }
 
 /* CONTAINER */
 .container{
-    max-width:1000px;
+    max-width:1100px;
     margin:40px auto;
     padding:20px;
+}
+
+/* GRID LAYOUT */
+.top-section{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.bottom-section{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:20px;
+}
+
+@media(max-width:768px){
+    .top-section,
+    .bottom-section{
+        grid-template-columns:1fr;
+    }
 }
 
 /* CARD */
@@ -73,10 +75,6 @@ body{
     align-items:center;
 }
 
-.profile-info{
-    line-height:1.8;
-}
-
 .avatar{
     width:70px;
     height:70px;
@@ -86,7 +84,6 @@ body{
     align-items:center;
     justify-content:center;
     color:white;
-    font-size:28px;
 }
 
 /* ATTENDANCE */
@@ -102,7 +99,7 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    margin: auto;
+    margin:auto;
 }
 
 .circle span{
@@ -113,7 +110,6 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:22px;
     font-weight:bold;
 }
 
@@ -123,38 +119,21 @@ body{
     border-radius:10px;
     margin-bottom:12px;
     background:#f1f5f9;
-    transition:0.3s;
 }
 
-.teacher-card:hover{
-    background:#e2e8f0;
-}
-
-/* STATUS COLORS */
 .low{ color:red; }
 .avg{ color:orange; }
 .good{ color:green; }
+
+/* MODAL */
 .modal{
-  display:none;             /* hidden initially */
+  display:none;
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  inset:0;
   background:rgba(0,0,0,0.5);
   z-index:1000;
-
   justify-content:center;
   align-items:center;
-}
-.modal-content{
-  background:white;
-  padding:25px;
-  width:320px;
-  margin:120px auto;
-  border-radius:12px;
-  text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 .ml-modal-box{
@@ -163,63 +142,52 @@ body{
   width:340px;
   border-radius:16px;
   text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
-/* INPUT STYLE */
+
+/* INPUT */
 .input-group input{
   width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  margin-bottom:12px;
-  transition:0.3s;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
 
-.input-group input:focus{
-  border-color:#2563eb;
-  box-shadow:0 0 6px rgba(37,99,235,0.3);
-  outline:none;
-}
-
-/* PREDICT BUTTON */
+/* BUTTONS */
 .predict-btn{
   width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(90deg,#2563eb,#7c3aed);
+  padding:10px;
+  background:#2563eb;
   color:white;
-  font-weight:600;
+  border:none;
+  border-radius:8px;
   cursor:pointer;
-  transition:0.3s;
 }
 
-.predict-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 6px 15px rgba(0,0,0,0.2);
-}
-
-/* CLOSE BUTTON */
 .close-btn{
   margin-top:10px;
-  padding:10px;
+  padding:8px;
   border:none;
-  border-radius:10px;
-  background:#e5e7eb;
+  background:#ddd;
+  border-radius:8px;
   cursor:pointer;
 }
 
-.close-btn:hover{
-  background:#d1d5db;
+.ml-result-box{
+  margin-top:10px;
+  background:#f1f5f9;
+  padding:10px;
+  border-radius:8px;
 }
 
-/* RESULT BOX */
-.ml-result-box{
-  margin-top:12px;
+.ml-btn-modern{
+  margin-top:15px;
+  background:linear-gradient(90deg,#2563eb,#7c3aed);
+  color:white;
   padding:10px;
+  border:none;
   border-radius:10px;
-  background:#f1f5f9;
-  font-weight:500;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -228,55 +196,68 @@ body{
 
 <div class="header">
     <h2>🎓 Student Dashboard</h2>
-    <button id="studentLogout" class="logout-btn">Logout</button>
+    <button id="studentLogout">Logout</button>
 </div>
 
 <div class="container">
 
-    <!-- PROFILE -->
-    <div class="card profile">
-        <div class="profile-info">
-            <p><b>Name:</b> <span id="name"></span></p>
-            <p><b>Email:</b> <span id="email"></span></p>
-            <p><b>ID:</b> <span id="studentId"></span></p>
+    <!-- TOP SECTION -->
+    <div class="top-section">
+
+        <!-- PROFILE -->
+        <div class="card profile">
+            <div>
+                <p><b>Name:</b> <span id="name"></span></p>
+                <p><b>Email:</b> <span id="email"></span></p>
+                <p><b>ID:</b> <span id="studentId"></span></p>
+            </div>
+            <div class="avatar">👤</div>
         </div>
-        <div class="avatar">👤</div>
+
+        <!-- ATTENDANCE -->
+        <div class="card attendance-box">
+            <h3>Overall Attendance</h3>
+            <div class="circle" id="circle">
+                <span id="attendance">0%</span>
+            </div>
+        </div>
+
     </div>
 
-    <!-- ATTENDANCE -->
-    <div class="card attendance-box">
-        <h3>Overall Attendance</h3>
-        <div class="circle" id="circle">
-            <span id="attendance">0%</span>
-        </div>
-    </div>
-   <div class="card ml-card modern-ml">
-  <div class="ml-header">
-    <h3>🤖 Attendance Predictor</h3>
-    <p>Check how many classes you need to stay safe</p>
-  </div>
+    <!-- BOTTOM SECTION -->
+    <div class="bottom-section">
 
-  <button class="ml-btn-modern" onclick="openMLModal()">
-    🚀 Predict Now
-  </button>
+        <!-- PREDICTOR -->
+        <div class="card">
+            <h3>🤖 Attendance Predictor</h3>
+            <p>Check how many classes you need</p>
+            <button class="ml-btn-modern" onclick="openMLModal()">
+                Predict Now
+            </button>
+        </div>
+
+        <!-- TEACHERS -->
+        <div class="card">
+            <h3>📊 Attendance by Teacher</h3>
+            <div id="history"></div>
+        </div>
+
+    </div>
+
 </div>
 
+<!-- MODAL -->
 <div id="mlModal" class="modal">
   <div class="ml-modal-box">
 
-    <h2>📊 Attendance Predictor</h2>
+    <h3>Attendance Predictor</h3>
 
     <div class="input-group">
       <input id="totalInput" placeholder="Total Classes Conducted">
-    </div>
-
-    <div class="input-group">
       <input id="percentInput" placeholder="Current Attendance (%)">
     </div>
 
-    <button class="predict-btn" onclick="calculatePrediction()">
-      Predict
-    </button>
+    <button class="predict-btn" onclick="calculatePrediction()">Predict</button>
 
     <div id="mlOutput" class="ml-result-box"></div>
 
@@ -285,24 +266,10 @@ body{
   </div>
 </div>
 
-    <!-- TEACHERS -->
-    <div class="card">
-        <h3>📊 Attendance by Teacher</h3>
-        <div id="history"></div>
-    </div>
-
-</div>
-
 <script>
-    window.onclick = function(e){
-  const modal = document.getElementById("mlModal");
-  if(e.target === modal){
-    closeMLModal();
-  }
-}
 const studentId = localStorage.getItem("studentId");
 
-// PROFILE
+/* PROFILE */
 fetch("https://qr-1-jep5.onrender.com/student/" + studentId)
 .then(res => res.json())
 .then(data => {
@@ -311,7 +278,7 @@ fetch("https://qr-1-jep5.onrender.com/student/" + studentId)
     document.getElementById("studentId").innerText = data.studentId;
 });
 
-// ATTENDANCE
+/* ATTENDANCE */
 fetch("https://qr-1-jep5.onrender.com/student/attendance/" + studentId)
 .then(res => res.json())
 .then(data => {
@@ -319,7 +286,6 @@ fetch("https://qr-1-jep5.onrender.com/student/attendance/" + studentId)
     const percent = data.overall;
     document.getElementById("attendance").innerText = percent + "%";
 
-    // 🔥 Circle progress
     document.getElementById("circle")
         .style.setProperty("--value", percent + "%");
 
@@ -335,7 +301,7 @@ fetch("https://qr-1-jep5.onrender.com/student/attendance/" + studentId)
         card.className = "teacher-card";
 
         card.innerHTML = `
-            <b>👨‍🏫 ${t.teacherName}</b><br>
+            <b>${t.teacherName}</b><br>
             Attendance: <b class="${statusClass}">
                 ${t.percentage}%
             </b><br>
@@ -347,38 +313,25 @@ fetch("https://qr-1-jep5.onrender.com/student/attendance/" + studentId)
 
 });
 
-// LOGOUT
-document.getElementById("studentLogout")
-.addEventListener("click", function(){
-    localStorage.removeItem("studentId");
-    window.location.href = "index.html";
-});
-</script>
-<script>
-    function openMLModal(){
+/* MODAL */
+function openMLModal(){
   document.getElementById("mlModal").style.display = "flex";
 }
 
 function closeMLModal(){
   document.getElementById("mlModal").style.display = "none";
-
-  // clear inputs
   document.getElementById("totalInput").value = "";
   document.getElementById("percentInput").value = "";
   document.getElementById("mlOutput").innerHTML = "";
 }
 
+/* PREDICT */
 function calculatePrediction(){
 
   const total = parseFloat(document.getElementById("totalInput").value);
   const percent = parseFloat(document.getElementById("percentInput").value);
 
-if(isNaN(total) || isNaN(percent)){
-    alert("Enter valid values");
-    return;
-  }
-
- const attended = Math.round((percent / 100) * total);
+  const attended = Math.round((percent / 100) * total);
 
   fetch("https://qr-1-jep5.onrender.com/student/ml-predict", {
     method:"POST",
@@ -394,10 +347,24 @@ if(isNaN(total) || isNaN(percent)){
     }
 
     document.getElementById("mlOutput").innerHTML =
-  `📊 Current: <b>${percent}%</b><br>
-   🎯 Need <b>${data.needed}</b> classes to reach 75%`;
+      `Need <b>${data.needed}</b> classes`;
   });
 }
+
+/* CLOSE ON OUTSIDE */
+window.onclick = function(e){
+  const modal = document.getElementById("mlModal");
+  if(e.target === modal){
+    closeMLModal();
+  }
+};
+
+/* LOGOUT */
+document.getElementById("studentLogout").onclick = function(){
+    localStorage.removeItem("studentId");
+    window.location.href = "index.html";
+};
 </script>
+
 </body>
 </html>
