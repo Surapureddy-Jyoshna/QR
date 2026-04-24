@@ -183,26 +183,38 @@ body{
             <span id="attendance">0%</span>
         </div>
     </div>
-    <div class="card ml-card">
-  <h3>🤖 Attendance Predictor</h3>
+   <div class="card ml-card modern-ml">
+  <div class="ml-header">
+    <h3>🤖 Attendance Predictor</h3>
+    <p>Check how many classes you need to stay safe</p>
+  </div>
 
-  <button class="ml-btn" onclick="openMLModal()">
-    🔍 Predict Needed Classes
+  <button class="ml-btn-modern" onclick="openMLModal()">
+    🚀 Predict Now
   </button>
 </div>
 
-<div id="mlModal" class="modal">
-  <div class="modal-content">
-    <h3>Enter Details</h3>
+<div id="mlModal" class="modal-overlay">
+  <div class="ml-modal-box">
 
-<input id="totalInput" placeholder="Total Classes Conducted"><br><br>
-<input id="percentInput" placeholder="Current Attendance (%)"><br><br>
+    <h2>📊 Attendance Predictor</h2>
 
-    <button onclick="calculatePrediction()">Predict</button>
+    <div class="input-group">
+      <input id="totalInput" placeholder="Total Classes Conducted">
+    </div>
 
-    <p id="mlOutput"></p>
+    <div class="input-group">
+      <input id="percentInput" placeholder="Current Attendance (%)">
+    </div>
 
-    <button onclick="closeMLModal()">Close</button>
+    <button class="predict-btn" onclick="calculatePrediction()">
+      Predict
+    </button>
+
+    <div id="mlOutput" class="ml-result-box"></div>
+
+    <button class="close-btn" onclick="closeMLModal()">Close</button>
+
   </div>
 </div>
 
@@ -271,11 +283,11 @@ document.getElementById("studentLogout")
 </script>
 <script>
     function openMLModal(){
-  document.getElementById("mlModal").style.display = "block";
+  document.getElementById("mlModal").style.display = "flex";
 }
 
 function closeMLModal(){
-  document.getElementById("mlModal").style.display = "none";
+  document.getElementById("mlModal").style.display = "flex";
 }
 
 function calculatePrediction(){
@@ -305,8 +317,8 @@ if(isNaN(total) || isNaN(percent)){
     }
 
     document.getElementById("mlOutput").innerHTML =
-      `📊 Current: ${percent}% <br>
-       📈 You need <b>${data.needed}</b> more classes to reach 75%`;
+  `📊 Current: <b>${percent}%</b><br>
+   🎯 Need <b>${data.needed}</b> classes to reach 75%`;
   });
 }
 </script>
