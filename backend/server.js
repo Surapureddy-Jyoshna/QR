@@ -839,15 +839,27 @@ for (const cls of classes) {
       needed: response.data.needed
     });
 
-  } catch (err) {
-    console.error("ML Server Error:", err.message);
+ } catch (err) {
 
-    res.json({
-      current: Math.round(current),
-      needed: 0,
-      error: "ML server not running"
-    });
+  console.log("ML server failed → using formula");
+
+  const target = 75;
+
+  let needed = 0;
+  let futureTotal = total;
+  let futureAttend = attended;
+
+  while ((futureAttend / futureTotal) * 100 < target) {
+    futureTotal++;
+    futureAttend++;
+    needed++;
   }
+
+  res.json({
+    current: Math.round(current),
+    needed
+  });
+}
 });
 app.post("/student/ml-predict", async (req, res) => {
 
