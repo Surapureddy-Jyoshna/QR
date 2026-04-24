@@ -154,6 +154,29 @@ body{
   text-align:center;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
+
+  display:flex;              /* 🔥 IMPORTANT */
+  justify-content:center;    /* center horizontally */
+  align-items:center;        /* center vertically */
+}
+
+.ml-modal-box{
+  background:white;
+  padding:25px;
+  width:340px;
+  border-radius:16px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
 </style>
 </head>
 
@@ -300,8 +323,7 @@ if(isNaN(total) || isNaN(percent)){
     return;
   }
 
-  // 🔥 convert % → attended
-  const attended = (percent / 100) * total;
+ const attended = Math.round((percent / 100) * total);
 
   fetch("https://qr-1-jep5.onrender.com/student/ml-predict", {
     method:"POST",
