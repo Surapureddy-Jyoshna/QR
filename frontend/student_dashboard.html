@@ -165,17 +165,26 @@ body{
         </div>
     </div>
     <div class="card ml-card">
-    <h3>🤖 Attendance Predictor</h3>
+  <h3>🤖 Attendance Predictor</h3>
 
-    <div class="ml-content">
-        <button class="ml-btn" onclick="predictML()">
-            🔍 Predict Needed Classes
-        </button>
+  <button class="ml-btn" onclick="openMLModal()">
+    🔍 Predict Needed Classes
+  </button>
+</div>
 
-        <div id="mlResult" class="ml-result">
-            Click the button to get prediction
-        </div>
-    </div>
+<div id="mlModal" class="modal">
+  <div class="modal-content">
+    <h3>Enter Details</h3>
+
+    <input id="totalInput" placeholder="Total Classes"><br><br>
+    <input id="attendedInput" placeholder="Classes Attended"><br><br>
+
+    <button onclick="calculatePrediction()">Predict</button>
+
+    <p id="mlOutput"></p>
+
+    <button onclick="closeMLModal()">Close</button>
+  </div>
 </div>
 
     <!-- TEACHERS -->
@@ -242,32 +251,40 @@ document.getElementById("studentLogout")
 });
 </script>
 <script>
-  function predictML(){
+    function openMLModal(){
+  document.getElementById("mlModal").style.display = "block";
+}
 
-  const id = localStorage.getItem("studentId");
+function closeMLModal(){
+  document.getElementById("mlModal").style.display = "none";
+}
 
-  const resultBox = document.getElementById("mlResult");
-  resultBox.innerHTML = "⏳ Predicting...";
+function calculatePrediction(){
 
-  fetch(`https://qr-1-jep5.onrender.com/student/ml-needed/${id}`)
+  const total = parseInt(document.getElementById("totalInput").value);
+  const attended = parseInt(document.getElementById("attendedInput").value);
+
+  if(!total || !attended){
+    alert("Enter valid values");
+    return;
+  }
+
+  fetch("https://qr-1-jep5.onrender.com/student/ml-predict", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ total, attended })
+  })
   .then(res => res.json())
   .then(data => {
 
-    let color = "#16a34a"; // green
-    if(data.current < 75) color = "#dc2626"; // red
-    else if(data.current < 85) color = "#f59e0b"; // orange
+    if(data.error){
+      document.getElementById("mlOutput").innerText = data.error;
+      return;
+    }
 
-    resultBox.innerHTML = `
-        <div style="color:${color}; font-size:18px;">
-            📊 Current: <b>${data.current}%</b>
-        </div>
-        <div style="margin-top:8px;">
-            📈 You need <b>${data.needed}</b> more classes
-        </div>
-    `;
-  })
-  .catch(err => {
-    resultBox.innerHTML = "❌ Failed to get prediction";
+    document.getElementById("mlOutput").innerHTML =
+      `📊 Current: ${data.current}% <br>
+       📈 Need ${data.needed} classes`;
   });
 }
 </script>

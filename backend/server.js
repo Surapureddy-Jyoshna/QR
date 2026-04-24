@@ -798,19 +798,27 @@ app.get("/student/ml-needed/:studentId", async (req, res) => {
 
   const studentId = req.params.studentId;
 
-  const records = await Attendance.find({
-    "students.studentId": studentId
+ // get all classes for student section
+const classes = await Class.find();
+
+let total = classes.length;
+let attended = 0;
+
+for (const cls of classes) {
+  const record = await Attendance.findOne({
+    teacherId: cls.teacherId,
+    date: cls.date,
+    section: cls.section
   });
 
-  let total = records.length;
-  let attended = 0;
+  if (!record) continue;
 
-  records.forEach(r => {
-    const present = r.students.some(
-      s => s.studentId === studentId
-    );
-    if(present) attended++;
-  });
+  const present = record.students.some(
+    s => s.studentId === studentId
+  );
+
+  if (present) attended++;
+}
 
   if(total === 0){
     return res.json({ current: 0, needed: 0 });
@@ -839,5 +847,34 @@ app.get("/student/ml-needed/:studentId", async (req, res) => {
       needed: 0,
       error: "ML server not running"
     });
+  }
+});
+app.post("/student/ml-predict", async (req, res) => {
+
+  const { total, attended } = req.body;
+
+  if(!total || !attended){
+    return res.json({ error: "Invalid input" });
+  }
+
+  const current = (attended / total) * 100;
+
+  try {
+    const response = await axios.post(
+      "https://attedance-ml-lq0c.onrender.com/predict",
+      {
+        current,
+        total,
+        attended
+      }
+    );
+
+    res.json({
+      current: Math.round(current),
+      needed: response.data.needed
+    });
+
+  } catch (err) {
+    res.json({ error: "ML server error" });
   }
 });

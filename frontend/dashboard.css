@@ -920,3 +920,28 @@
     padding: 12px;
     border-radius: 10px;
 }
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+}
+
+.modal-content{
+  background:white;
+  padding:20px;
+  width:300px;
+  margin:100px auto;
+  border-radius:12px;
+  text-align:center;
+}
+
+.ml-btn{
+  padding:10px 16px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
