@@ -450,7 +450,7 @@ app.post("/student/mark-attendance", async (req, res) => {
   lng
 );
 
-if(distance > 120){
+if(distance > 300 + (accuracy || 0)){
   return res.json({
     success:false,
     message:"You are not in classroom!"
