@@ -820,7 +820,7 @@ app.get("/student/ml-needed/:studentId", async (req, res) => {
 
   try {
     // 🔥 CALL ML SERVER
-    const response = await axios.post("http://localhost:5001/predict", {
+    const response = await axios.post("https://attedance-ml-lq0c.onrender.com/predict", {
       current: current,
       total: total,
       attended: attended
