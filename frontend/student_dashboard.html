@@ -176,8 +176,8 @@ body{
   <div class="modal-content">
     <h3>Enter Details</h3>
 
-    <input id="totalInput" placeholder="Total Classes"><br><br>
-    <input id="attendedInput" placeholder="Classes Attended"><br><br>
+<input id="totalInput" placeholder="Total Classes Conducted"><br><br>
+<input id="percentInput" placeholder="Current Attendance (%)"><br><br>
 
     <button onclick="calculatePrediction()">Predict</button>
 
@@ -261,13 +261,16 @@ function closeMLModal(){
 
 function calculatePrediction(){
 
-  const total = parseInt(document.getElementById("totalInput").value);
-  const attended = parseInt(document.getElementById("attendedInput").value);
+  const total = parseFloat(document.getElementById("totalInput").value);
+  const percent = parseFloat(document.getElementById("percentInput").value);
 
-  if(!total || !attended){
+  if(!total || !percent){
     alert("Enter valid values");
     return;
   }
+
+  // 🔥 convert % → attended
+  const attended = (percent / 100) * total;
 
   fetch("https://qr-1-jep5.onrender.com/student/ml-predict", {
     method:"POST",
@@ -283,8 +286,8 @@ function calculatePrediction(){
     }
 
     document.getElementById("mlOutput").innerHTML =
-      `📊 Current: ${data.current}% <br>
-       📈 Need ${data.needed} classes`;
+      `📊 Current: ${percent}% <br>
+       📈 You need <b>${data.needed}</b> more classes to reach 75%`;
   });
 }
 </script>
