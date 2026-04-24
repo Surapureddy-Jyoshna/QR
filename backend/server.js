@@ -818,12 +818,26 @@ app.get("/student/ml-needed/:studentId", async (req, res) => {
 
   const current = (attended / total) * 100;
 
-  let needed = Math.ceil((0.75 * total - attended) / 0.25);
-  if(needed < 0) needed = 0;
+  try {
+    // 🔥 CALL ML SERVER
+    const response = await axios.post("http://localhost:5001/predict", {
+      current: current,
+      total: total,
+      attended: attended
+    });
 
-  res.json({
-    current: Math.round(current),
-    needed
-  });
+    res.json({
+      current: Math.round(current),
+      needed: response.data.needed
+    });
 
+  } catch (err) {
+    console.error("ML Server Error:", err.message);
+
+    res.json({
+      current: Math.round(current),
+      needed: 0,
+      error: "ML server not running"
+    });
+  }
 });

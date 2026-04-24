@@ -164,11 +164,19 @@ body{
             <span id="attendance">0%</span>
         </div>
     </div>
-    <!-- <div class="card">
-  <h3>🤖 ML Attendance Predictor</h3>
-  <button onclick="predictML()">Check Needed Classes</button>
-  <p id="mlResult"></p>
-</div> -->
+    <div class="card ml-card">
+    <h3>🤖 Attendance Predictor</h3>
+
+    <div class="ml-content">
+        <button class="ml-btn" onclick="predictML()">
+            🔍 Predict Needed Classes
+        </button>
+
+        <div id="mlResult" class="ml-result">
+            Click the button to get prediction
+        </div>
+    </div>
+</div>
 
     <!-- TEACHERS -->
     <div class="card">
@@ -234,18 +242,32 @@ document.getElementById("studentLogout")
 });
 </script>
 <script>
-    function predictML(){
+  function predictML(){
 
   const id = localStorage.getItem("studentId");
+
+  const resultBox = document.getElementById("mlResult");
+  resultBox.innerHTML = "⏳ Predicting...";
 
   fetch(`https://qr-1-jep5.onrender.com/student/ml-needed/${id}`)
   .then(res => res.json())
   .then(data => {
 
-    document.getElementById("mlResult").innerHTML =
-      `Current: ${data.current}% <br>
-       Need ${data.needed} classes to reach safe zone`;
+    let color = "#16a34a"; // green
+    if(data.current < 75) color = "#dc2626"; // red
+    else if(data.current < 85) color = "#f59e0b"; // orange
 
+    resultBox.innerHTML = `
+        <div style="color:${color}; font-size:18px;">
+            📊 Current: <b>${data.current}%</b>
+        </div>
+        <div style="margin-top:8px;">
+            📈 You need <b>${data.needed}</b> more classes
+        </div>
+    `;
+  })
+  .catch(err => {
+    resultBox.innerHTML = "❌ Failed to get prediction";
   });
 }
 </script>
