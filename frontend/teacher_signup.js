@@ -2,41 +2,44 @@ const BASE_URL = "https://qr-1-jep5.onrender.com";
 document.getElementById("teacherSignupForm")
 .addEventListener("submit", async function(e){
 
-    e.preventDefault();
+  e.preventDefault();
 
-    const teacherData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        employeeId: document.getElementById("employeeId").value,
-        password: document.getElementById("password").value,
-        department: document.getElementById("department").value
-    };
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const employeeId = document.getElementById("employeeId").value;
+  const password = document.getElementById("password").value;
+  const department = document.getElementById("department").value;
 
-    try {
-        const res = await fetch(`${BASE_URL}/teacher/signup`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(teacherData)
-        });
+  try{
 
-        let data;
+    const res = await fetch(`${BASE_URL}/teacher/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        email,
+        employeeId,
+        password,
+        department
+      })
+    });
 
-        if (!res.ok) {
-            const text = await res.text();   // 👈 VERY IMPORTANT
-            console.error("Server Error:", text);
-            alert("Signup Failed! Check backend.");
-            return;
-        }
+    const data = await res.json();
 
-data = await res.json();
-
-localStorage.setItem("token", data.token);
-window.location.href = "teacher_dashboard.html";
-
-    } catch (err) {
-        console.error(err);
-        alert("Error occurred!");
+    if(!data.success){
+      alert(data.message || "Signup failed");
+      return;
     }
+
+    // ✅ SAVE TOKEN
+    localStorage.setItem("token", data.token);
+
+    // ✅ REDIRECT TO DASHBOARD
+    window.location.href = "teacher_dashboard.html";
+
+  }catch(err){
+    console.error(err);
+    alert("Server error");
+  }
+
 });

@@ -20,10 +20,6 @@ if (!token) {
     return;
 }
 
-    if (!token){
-        window.location.href = "teacher_login.html";
-        return;
-    }
 
     try{
 

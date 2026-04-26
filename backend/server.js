@@ -189,7 +189,16 @@ app.post("/teacher/signup", async (req, res) => {
 
     console.log("✅ Saved successfully");
 
-    res.json({ message: "Teacher Registered Successfully" });
+    const token = jwt.sign(
+  { id: newTeacher._id },
+  "mySecretKey",
+  { expiresIn: "1h" }
+);
+
+res.json({
+  success: true,
+  token: token
+});
 
   } catch (error) {
     console.error("❌ FULL ERROR:", error);   // 👈 VERY IMPORTANT
