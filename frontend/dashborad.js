@@ -13,10 +13,9 @@ function hideAllSections(){
 }
 
 window.onload = async function(){
-
     const token = localStorage.getItem("token");
-    if (!token) {
-    alert("Login expired. Please login again.");
+
+if (!token) {
     window.location.href = "teacher_login.html";
     return;
 }
@@ -33,8 +32,11 @@ window.onload = async function(){
 });
 
 if (!response.ok) {
-    console.error("Profile API failed");
-    alert("Backend not working or token invalid");
+    console.error("Token invalid or expired");
+
+    localStorage.removeItem("token");   // 🔥 clear wrong token
+    window.location.href = "teacher_login.html"; // redirect properly
+
     return;
 }
 
