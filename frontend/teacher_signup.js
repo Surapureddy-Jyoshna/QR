@@ -32,8 +32,7 @@ document.getElementById("teacherSignupForm")
 
 data = await res.json();
 
-alert(data.message);
-
+localStorage.setItem("token", data.token);
 window.location.href = "teacher_dashboard.html";
 
     } catch (err) {

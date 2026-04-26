@@ -120,7 +120,7 @@ global.sessions = [];
 app.post("/student/signup", async (req, res) => {
   const newStudent = new Student(req.body);
   await newStudent.save();
-  res.json({ message: "Student Registered Successfully" });
+res.json({ message: "Account Created" });
 });
 // Student Login API
 app.post("/student/login", async (req, res) => {
@@ -189,7 +189,16 @@ app.post("/teacher/signup", async (req, res) => {
 
     console.log("✅ Saved successfully");
 
-    res.json({ message: "Teacher Registered Successfully" });
+    const token = jwt.sign(
+  { id: newTeacher._id },
+  "mySecretKey",
+  { expiresIn: "1h" }
+);
+
+res.json({
+  success: true,
+  token: token
+});
 
   } catch (error) {
     console.error("❌ FULL ERROR:", error);   // 👈 VERY IMPORTANT
@@ -879,19 +888,32 @@ app.post("/student/ml-predict", async (req, res) => {
   try {
     const response = await axios.post(
       "https://attedance-ml-lq0c.onrender.com/predict",
-      {
-        current,
-        total,
-        attended
-      }
+      { current, total, attended }
     );
 
-    res.json({
+    return res.json({
       current: Math.round(current),
       needed: response.data.needed
     });
 
   } catch (err) {
-    res.json({ error: "ML server error" });
+
+    // ✅ ALWAYS WORKING FALLBACK
+    const target = 75;
+
+    let needed = 0;
+    let futureTotal = total;
+    let futureAttend = attended;
+
+    while ((futureAttend / futureTotal) * 100 < target) {
+      futureTotal++;
+      futureAttend++;
+      needed++;
+    }
+
+    return res.json({
+      current: Math.round(current),
+      needed
+    });
   }
 });
