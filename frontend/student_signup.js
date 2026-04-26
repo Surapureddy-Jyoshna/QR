@@ -35,5 +35,5 @@ document.getElementById("studentSignupForm")
 
 
     document.getElementById("message").innerText =
-        "Signup Successful ✅ (Backend not connected yet)";
+        "Signup Successful ✅";
 });
