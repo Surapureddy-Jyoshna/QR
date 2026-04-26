@@ -677,25 +677,22 @@ const studentSection = attendanceRecords[0]?.section;
 
 
 
-  const teacherMap = {};
+const teacherMap = {};
 
-  const classes = await Class.find();
+// ✅ get ONLY classes where student actually belongs
+const classes = await Class.find({
+  section: studentSection
+});
 
 for (const cls of classes) {
 
   const teacherId = String(cls.teacherId);
 
-  // ✅ ONLY consider student's section
-  const belongsToStudentSection = attendanceRecords.some(
-    r => r.section === cls.section
-  );
-
-  if (!belongsToStudentSection) continue;
-
-  // get teacher name
-  const teacher = await Teacher.findById(cls.teacherId);
-
+  // get teacher name once
   if (!teacherMap[teacherId]) {
+
+    const teacher = await Teacher.findById(teacherId);
+
     teacherMap[teacherId] = {
       teacherName: teacher ? teacher.name : "Unknown",
       totalClasses: 0,
@@ -703,18 +700,18 @@ for (const cls of classes) {
     };
   }
 
-  // ✅ count class
+  // ✅ count total classes
   teacherMap[teacherId].totalClasses++;
 
-  // ✅ check if THIS student attended THIS class
-  const attended = attendanceRecords.some(
+  // ✅ check attendance EXACT MATCH
+  const record = attendanceRecords.find(
     r =>
       String(r.teacherId) === teacherId &&
       r.date === cls.date &&
       r.section === cls.section
   );
 
-  if (attended) {
+  if (record) {
     teacherMap[teacherId].attended++;
   }
 }
