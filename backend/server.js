@@ -707,14 +707,20 @@ for (const cls of classes) {
   // ✅ count total classes
   teacherMap[teacherId].totalClasses++;
 
-  const attended = attendanceRecords.some(r =>
+  const record = attendanceRecords.find(r =>
   String(r.teacherId) === teacherId &&
   r.section === cls.section &&
-  r.students.some(s => s.studentId === studentId)
+  r.date === cls.date   // ✅ IMPORTANT
 );
 
-if (attended) {
-  teacherMap[teacherId].attended++;
+if (record) {
+  const present = record.students.some(
+    s => s.studentId === studentId
+  );
+
+  if (present) {
+    teacherMap[teacherId].attended++;
+  }
 }
 }
 
