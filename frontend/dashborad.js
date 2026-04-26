@@ -541,6 +541,8 @@ async function loadSectionData(){
         document.getElementById("totalClasses").innerText = "0";
         document.getElementById("totalStudents").innerText = "0";
         document.getElementById("todaysAttendance").innerText ="0";
+        clearInterval(liveInterval);
+window.currentSessionId = null;
         return;
     }
 
