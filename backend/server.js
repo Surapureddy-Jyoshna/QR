@@ -673,7 +673,11 @@ app.get("/student/attendance/:studentId", async (req, res) => {
   "students.studentId": studentId
 });
 
-const studentSection = attendanceRecords[0]?.section;
+if (attendanceRecords.length === 0) {
+  return res.json({ overall: 0, teachers: [] });
+}
+
+const studentSection = attendanceRecords[0].section;
 
 
 
@@ -703,17 +707,15 @@ for (const cls of classes) {
   // ✅ count total classes
   teacherMap[teacherId].totalClasses++;
 
-  // ✅ check attendance EXACT MATCH
-  const record = attendanceRecords.find(
-    r =>
-      String(r.teacherId) === teacherId &&
-      r.date === cls.date &&
-      r.section === cls.section
-  );
+  const attended = attendanceRecords.some(r =>
+  String(r.teacherId) === teacherId &&
+  r.section === cls.section &&
+  r.students.some(s => s.studentId === studentId)
+);
 
-  if (record) {
-    teacherMap[teacherId].attended++;
-  }
+if (attended) {
+  teacherMap[teacherId].attended++;
+}
 }
 
   const teachers = Object.values(teacherMap).map(t => ({
