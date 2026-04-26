@@ -870,7 +870,7 @@ app.post("/student/ml-predict", async (req, res) => {
 
   const { total, attended } = req.body;
 
-  if(!total || !attended){
+  if(total == null || attended == null || isNaN(total) || isNaN(attended)){
     return res.json({ error: "Invalid input" });
   }
 
