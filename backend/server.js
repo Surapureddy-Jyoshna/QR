@@ -74,6 +74,7 @@ const classSchema = new mongoose.Schema({
 const Class = mongoose.model("Class", classSchema, "Classes");
 const attendanceSchema = new mongoose.Schema({
     teacherId: String,
+    classId: String, 
     date: String,
     section: String,
     students: [
@@ -485,8 +486,9 @@ if (alreadyFromDevice) {
   let record = await Attendance.findOneAndUpdate(
   {
     teacherId: session.teacherId,
-    date,
-    section
+classId: session.classId,   // ✅ VERY IMPORTANT
+date,
+section
   },
   {
     $setOnInsert: {
@@ -692,16 +694,16 @@ const studentSection = attendanceRecords[0].section;
 
 const teacherMap = {};
 
-// ✅ get ONLY classes where student actually belongs
+// get all classes of student's section
 const classes = await Class.find({
-  section: studentSection
+  sections: studentSection
 });
 
 for (const cls of classes) {
 
   const teacherId = String(cls.teacherId);
 
-  // get teacher name once
+  // create teacher entry
   if (!teacherMap[teacherId]) {
 
     const teacher = await Teacher.findById(teacherId);
@@ -713,24 +715,25 @@ for (const cls of classes) {
     };
   }
 
-  // ✅ count total classes
+  // ✅ count total classes per teacher
   teacherMap[teacherId].totalClasses++;
 
+  // ✅ find attendance for THIS class + teacher + section
   const record = attendanceRecords.find(r =>
-  String(r.teacherId) === teacherId &&
-  r.section === cls.section &&
-  r.date === cls.date   // ✅ IMPORTANT
-);
-
-if (record) {
-  const present = record.students.some(
-    s => s.studentId === studentId
+    String(r.teacherId) === teacherId &&
+    r.classId === cls.classId &&
+    r.section === studentSection
   );
 
-  if (present) {
-    teacherMap[teacherId].attended++;
+  if (record) {
+    const present = record.students.some(
+      s => s.studentId === studentId
+    );
+
+    if (present) {
+      teacherMap[teacherId].attended++;
+    }
   }
-}
 }
 
   const teachers = Object.values(teacherMap).map(t => ({
