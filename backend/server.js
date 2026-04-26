@@ -901,6 +901,24 @@ app.post("/student/ml-predict", async (req, res) => {
     });
 
   } catch (err) {
-    res.json({ error: "ML server error" });
+
+  console.log("ML failed → using fallback");
+
+  const target = 75;
+
+  let needed = 0;
+  let futureTotal = total;
+  let futureAttend = attended;
+
+  while ((futureAttend / futureTotal) * 100 < target) {
+    futureTotal++;
+    futureAttend++;
+    needed++;
   }
+
+  res.json({
+    current: Math.round(current),
+    needed
+  });
+}
 });
