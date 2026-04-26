@@ -562,8 +562,7 @@ window.currentSessionId = null;
 
     const data = await response.json();
 
-    // ❌ REMOVE THIS LINE (important)
-    // document.getElementById("totalClasses").innerText = data.totalClasses;
+    
 
     document.getElementById("totalStudents").innerText =
         data.totalStudents;

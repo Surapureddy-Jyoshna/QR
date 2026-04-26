@@ -351,7 +351,7 @@ function calculatePrediction(){
   });
 }
 
-/* CLOSE ON OUTSIDE */
+
 window.onclick = function(e){
   const modal = document.getElementById("mlModal");
   if(e.target === modal){
@@ -359,7 +359,6 @@ window.onclick = function(e){
   }
 };
 
-/* LOGOUT */
 document.getElementById("studentLogout").onclick = function(){
     localStorage.removeItem("studentId");
     window.location.href = "index.html";

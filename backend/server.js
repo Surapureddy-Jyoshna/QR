@@ -74,7 +74,6 @@ const classSchema = new mongoose.Schema({
 const Class = mongoose.model("Class", classSchema, "Classes");
 const attendanceSchema = new mongoose.Schema({
     teacherId: String,
-    classId: String, 
     date: String,
     section: String,
     students: [
@@ -121,7 +120,7 @@ global.sessions = [];
 app.post("/student/signup", async (req, res) => {
   const newStudent = new Student(req.body);
   await newStudent.save();
-res.json({ message: "Account Created" });
+  res.json({ message: "Student Registered Successfully" });
 });
 // Student Login API
 app.post("/student/login", async (req, res) => {
@@ -190,16 +189,7 @@ app.post("/teacher/signup", async (req, res) => {
 
     console.log("✅ Saved successfully");
 
-    const token = jwt.sign(
-  { id: newTeacher._id },
-  "mySecretKey",
-  { expiresIn: "1h" }
-);
-
-res.json({
-  success: true,
-  token: token
-});
+    res.json({ message: "Teacher Registered Successfully" });
 
   } catch (error) {
     console.error("❌ FULL ERROR:", error);   // 👈 VERY IMPORTANT
@@ -486,9 +476,8 @@ if (alreadyFromDevice) {
   let record = await Attendance.findOneAndUpdate(
   {
     teacherId: session.teacherId,
-classId: session.classId,   // ✅ VERY IMPORTANT
-date,
-section
+    date,
+    section
   },
   {
     $setOnInsert: {
@@ -694,16 +683,16 @@ const studentSection = attendanceRecords[0].section;
 
 const teacherMap = {};
 
-// get all classes of student's section
+// ✅ get ONLY classes where student actually belongs
 const classes = await Class.find({
-  sections: studentSection
+  section: studentSection
 });
 
 for (const cls of classes) {
 
   const teacherId = String(cls.teacherId);
 
-  // create teacher entry
+  // get teacher name once
   if (!teacherMap[teacherId]) {
 
     const teacher = await Teacher.findById(teacherId);
@@ -715,25 +704,24 @@ for (const cls of classes) {
     };
   }
 
-  // ✅ count total classes per teacher
+  // ✅ count total classes
   teacherMap[teacherId].totalClasses++;
 
-  // ✅ find attendance for THIS class + teacher + section
   const record = attendanceRecords.find(r =>
-    String(r.teacherId) === teacherId &&
-    r.classId === cls.classId &&
-    r.section === studentSection
+  String(r.teacherId) === teacherId &&
+  r.section === cls.section &&
+  r.date === cls.date   // ✅ IMPORTANT
+);
+
+if (record) {
+  const present = record.students.some(
+    s => s.studentId === studentId
   );
 
-  if (record) {
-    const present = record.students.some(
-      s => s.studentId === studentId
-    );
-
-    if (present) {
-      teacherMap[teacherId].attended++;
-    }
+  if (present) {
+    teacherMap[teacherId].attended++;
   }
+}
 }
 
   const teachers = Object.values(teacherMap).map(t => ({
@@ -891,32 +879,19 @@ app.post("/student/ml-predict", async (req, res) => {
   try {
     const response = await axios.post(
       "https://attedance-ml-lq0c.onrender.com/predict",
-      { current, total, attended }
+      {
+        current,
+        total,
+        attended
+      }
     );
 
-    return res.json({
+    res.json({
       current: Math.round(current),
       needed: response.data.needed
     });
 
   } catch (err) {
-
-    // ✅ ALWAYS WORKING FALLBACK
-    const target = 75;
-
-    let needed = 0;
-    let futureTotal = total;
-    let futureAttend = attended;
-
-    while ((futureAttend / futureTotal) * 100 < target) {
-      futureTotal++;
-      futureAttend++;
-      needed++;
-    }
-
-    return res.json({
-      current: Math.round(current),
-      needed
-    });
+    res.json({ error: "ML server error" });
   }
 });
