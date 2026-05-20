@@ -822,3 +822,39 @@ async function loadSectionBarChart(){
     }
   });
 }
+function toggleSidebar(){
+
+    const sidebar =
+    document.getElementById("sidebar");
+
+    const openBtn =
+    document.getElementById("openSidebarBtn");
+
+    sidebar.classList.toggle("active");
+
+    if(sidebar.classList.contains("active")){
+
+        openBtn.style.display = "none";
+
+    }else{
+
+        openBtn.style.display = "block";
+    }
+}
+
+/* AUTO CLOSE AFTER CLICK */
+document.querySelectorAll(".nav-item")
+.forEach(item => {
+
+    item.addEventListener("click", () => {
+
+        if(window.innerWidth <= 768){
+
+            document.getElementById("sidebar")
+            .classList.remove("active");
+
+            document.getElementById("openSidebarBtn")
+            .style.display = "block";
+        }
+    });
+});

@@ -13,8 +13,21 @@
 
 <div class="dashboard-container">
 
+<!-- OPEN SIDEBAR BUTTON -->
+<button id="openSidebarBtn"
+class="open-sidebar-btn"
+onclick="toggleSidebar()">
+☰
+</button>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-top">
+  <button class="close-sidebar-btn"
+  onclick="toggleSidebar()">
+    ✕
+  </button>
+</div>
   <div class="sidebar-header">
     <div class="user-info">
       <div class="avatar"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -62,6 +75,7 @@
 <main class="main-content">
 
   <header class="dashboard-header">
+    
     <h1>Teacher Dashboard</h1>
     <button class="btn btn-primary" onclick="openClassModal()">+ Create Class</button>
 
