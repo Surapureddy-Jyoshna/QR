@@ -1351,3 +1351,41 @@
     overflow-x:auto;
   }
 }
+/* FORCE MOBILE TOGGLE BUTTON */
+.open-sidebar-btn{
+  position: fixed !important;
+  top: 15px !important;
+  left: 15px !important;
+  width: 50px !important;
+  height: 50px !important;
+  background: #7c3aed !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  z-index: 999999 !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .open-sidebar-btn{
+      display:flex !important;
+  }
+
+  .sidebar{
+      position: fixed !important;
+      left: -260px !important;
+      top: 0 !important;
+      height: 100vh !important;
+      z-index: 99999 !important;
+      transition: 0.3s ease;
+  }
+
+  .sidebar.active{
+      left:0 !important;
+  }
+}
